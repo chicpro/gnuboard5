@@ -23,6 +23,11 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
         <label for="login_auto_login">자동로그인</label>
     </fieldset>
 
+    <?php
+    // 소셜로그인 버튼
+    include_once(G5_PLUGIN_PATH.'/oauth/login.skin.inc.php');
+    ?>
+
     <aside id="login_info">
         <h2>회원로그인 안내</h2>
         <p>
