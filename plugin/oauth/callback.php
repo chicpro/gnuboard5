@@ -1,6 +1,7 @@
 <?php
 include_once('./_common.php');
 include_once(G5_PLUGIN_PATH.'/oauth/functions.php');
+include_once(G5_LIB_PATH.'/mailer.lib.php');
 
 if(get_session('ss_oauth_request_mode') != 'connect' && $member['mb_id'])
     alert_opener_url();
@@ -178,13 +179,3 @@ if(defined('G5_OAUTH_MEMBER_REGISTER') && G5_OAUTH_MEMBER_REGISTER && $member['m
 }
 ?>
 
-<script>
-var popup = window.opener;
-var url   = "";
-
-if(popup.document.getElementsByName("url").length)
-    url = decodeURIComponent(popup.document.getElementsByName("url")[0].value);
-
-popup.location.href = url;
-window.close();
-</script>
