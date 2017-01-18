@@ -254,6 +254,10 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
             <th scope="row">자동등록방지</th>
             <td><?php echo captcha_html(); ?></td>
         </tr>
+        <?php
+        // 소셜로그인
+        include_once(G5_PLUGIN_PATH.'/oauth/register_form.skin.inc.php');
+        ?>
         </tbody>
         </table>
     </div>
