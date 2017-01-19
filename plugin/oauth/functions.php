@@ -34,7 +34,7 @@ function get_oauth_member_info($no, $nick, $service)
         $id = $str.G5_OAUTH_ID_DELIMITER.$no;
 
     $pass = get_encrypt_string(pack('V*', rand(), rand(), rand(), rand()));
-    $nick = G5_OAUTH_NICK_PREFIX.$nick;
+    $nick = G5_OAUTH_NICK_PREFIX.preg_replace('#[^0-9A-Za-zㄱ-ㅎ가-힣]#', '', $nick);
 
     $info = array('id' => $id, 'pass' => $pass, 'nick' => $nick);
 

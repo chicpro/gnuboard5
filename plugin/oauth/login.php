@@ -28,6 +28,16 @@ if($member['mb_id']) {
         set_session('ss_oauth_request_mb_id',   $member['mb_id']);
         set_session('ss_oauth_request_mode',    'connect');
         set_session('ss_oauth_request_service', $service);
+    } else if($_GET['mode'] == 'confirm') {
+        // 회원정보 체크
+        $mb = get_member($member['mb_id'], 'mb_id');
+        if(!$mb['mb_id'])
+            alert_close('회원 정보가 존재하지 않습니다.');
+
+        // 연동처리를 위한 세션
+        set_session('ss_oauth_request_mb_id',   $member['mb_id']);
+        set_session('ss_oauth_request_mode',    'confirm');
+        set_session('ss_oauth_request_service', $service);
     } else {
         alert_opener_url();
     }
