@@ -20,7 +20,7 @@ define('G5_GOOGLE_SECRET_KEY', '');
 define('G5_OAUTH_CALLBACK_URL', G5_PLUGIN_URL.'/oauth/callback.php');
 
 // 닉네임 Prefix
-define('G5_OAUTH_NICK_PREFIX',  'sns-');
+define('G5_OAUTH_NICK_PREFIX',  '');
 
 // 로그인 ID 구분자
 define('G5_OAUTH_ID_DELIMITER', '_');
