@@ -28,6 +28,9 @@ define('G5_OAUTH_ID_DELIMITER', '_');
 // 회원가입을 허용하지 않는 경우 false 로 변경
 define('G5_OAUTH_MEMBER_REGISTER', true);
 
+// 회원가입 선택여부
+define('G5_OAUTH_MEMBER_REGISTER_SELECT', true);
+
 // 소셜 회원가입 테이블 생성, 테이블 생성 후 false 로 변경
 define('G5_OAUTH_TABLE_CREATE', true);
 

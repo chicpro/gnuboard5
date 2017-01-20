@@ -32,10 +32,8 @@ if($oauth->check_valid_state_token($_GET['state'])) {
                                 'mb_point'    => 0
                             );
 
-                    if(!(defined('G5_OAUTH_MEMBER_REGISTER') && G5_OAUTH_MEMBER_REGISTER)) {
-                        set_session('ss_oauth_member_no',                               'ggl_'.$oauth->profile->id);
-                        set_session('ss_oauth_member_ggl_'.$oauth->profile->id.'_info', $member);
-                    }
+                    set_session('ss_oauth_member_no',                               'ggl_'.$oauth->profile->id);
+                    set_session('ss_oauth_member_ggl_'.$oauth->profile->id.'_info', $member);
                 }
             } else {
                 alert_close('서비스 장애 또는 정보가 올바르지 않습니다.');

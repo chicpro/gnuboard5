@@ -31,11 +31,8 @@ if($oauth->check_valid_state_token($_GET['state'])) {
                             'mb_point'    => 0
                         );
 
-                // 회원가입 때는 처리하지 않음
-                if(!(defined('G5_OAUTH_MEMBER_REGISTER') && G5_OAUTH_MEMBER_REGISTER)) {
-                    set_session('ss_oauth_member_no',                               'nid_'.$oauth->profile->id);
-                    set_session('ss_oauth_member_nid_'.$oauth->profile->id.'_info', $member);
-                }
+                set_session('ss_oauth_member_no',                               'nid_'.$oauth->profile->id);
+                set_session('ss_oauth_member_nid_'.$oauth->profile->id.'_info', $member);
             }
         } else {
             alert_close('서비스 장애 또는 정보가 올바르지 않습니다.');
