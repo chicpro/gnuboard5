@@ -16,6 +16,14 @@ switch($service) {
         break;
 }
 
+if(defined('G5_OAUTH_MEMBER_REGISTER_SELECT') && G5_OAUTH_MEMBER_REGISTER_SELECT && $_GET['register'] == 'Y') {
+    unset($member);
+
+    set_session('ss_mb_id', '');
+    set_session('ss_oauth_member_'.get_session('ss_oauth_member_no').'_info', '');
+    set_session('ss_oauth_member_no', '');
+}
+
 if($member['mb_id']) {
     if($_GET['mode'] == 'connect') {
         // 기존 연동체크
@@ -41,6 +49,17 @@ if($member['mb_id']) {
     } else {
         alert_opener_url();
     }
+}
+
+// 회원가입 선택
+if(defined('G5_OAUTH_MEMBER_REGISTER_SELECT') && G5_OAUTH_MEMBER_REGISTER_SELECT) {
+    if(!isset($_SESSION['ss_oauth_member_register']))
+        set_session('ss_oauth_member_register', 'R');
+
+    if($_GET['register'] == 'Y')
+        set_session('ss_oauth_member_register', 'Y');
+    else if($_GET['register'] == 'N')
+        set_session('ss_oauth_member_register', 'N');
 }
 
 require G5_PLUGIN_PATH.'/oauth/'.$service.'/login.php';

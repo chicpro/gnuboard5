@@ -136,21 +136,47 @@ if($g5['social_member_table']) {
 
 // 회원가입처리
 if(defined('G5_OAUTH_MEMBER_REGISTER') && G5_OAUTH_MEMBER_REGISTER && $member['mb_id'] && $service != 'kakao') {
+    if(defined('G5_OAUTH_MEMBER_REGISTER_SELECT') && G5_OAUTH_MEMBER_REGISTER_SELECT) {
+        $mb_reg = get_session('ss_oauth_member_register');
+        $mb = get_member($member['mb_id'], 'mb_id');
+
+        if($mb['mb_id']) {
+            reset_social_info();
+            alert_opener_url($mb['mb_id'].'는(은) 다른 회원이 사용 중이므로 사용할 수 없습니다.', G5_URL);
+        }
+
+        if(!$mb['mb_id'] && $mb_reg == 'R' && $mb_reg != 'Y' && $mb_reg != 'N') {
+            $url1 = G5_PLUGIN_URL.'/oauth/login.php?service='.$service.'&register=Y';
+            $url2 = G5_PLUGIN_URL.'/oauth/login.php?service='.$service.'&register=N';
+            $url3 = G5_URL;
+
+            confirm($config['cf_title'].' 사이트에 회원가입 하시겠습니까?', $url1, $url2, $url3);
+        }
+
+        unset($_SESSION['ss_oauth_member_register']);
+    }
+
     // 중복체크
     $sql = " select count(*) as cnt from {$g5['member_table']} where mb_id = '{$member['mb_id']}' ";
     $row = sql_fetch($sql);
-    if($row['cnt'] > 0)
+    if($row['cnt'] > 0) {
+        reset_social_info();
         alert_opener_url('다른 회원이 사용 중인 아이디로는 회원가입할 수 없습니다.', G5_URL);
+    }
 
     $sql = " select count(*) as cnt from {$g5['member_table']} where mb_email = '{$member['mb_email']}' and mb_id <> '{$member['mb_id']}' ";
     $row = sql_fetch($sql);
-    if($row['cnt'] > 0)
+    if($row['cnt'] > 0) {
+        reset_social_info();
         alert_opener_url('다른 회원이 사용 중인 이메일로는 회원가입할 수 없습니다.', G5_URL);
+    }
 
     $sql = " select count(*) as cnt from {$g5['member_table']} where mb_id = '{$member['mb_id']}' and mb_id <> '{$member['mb_id']}' ";
     $row = sql_fetch($sql);
-    if($row['cnt'] > 0)
+    if($row['cnt'] > 0) {
+        reset_social_info();
         alert_opener_url('다른 회원이 사용 중인 닉네임으로는 회원가입할 수 없습니다.', G5_URL);
+    }
 
     $mb_id    = $member['mb_id'];
     $mb_email = $member['mb_email'];
@@ -210,8 +236,16 @@ if(defined('G5_OAUTH_MEMBER_REGISTER') && G5_OAUTH_MEMBER_REGISTER && $member['m
     set_session('ss_mb_reg', $mb_id);
 
     unset($member);
+    unset($_SESSION['ss_oauth_member_register']);
 
     alert_opener_url('', G5_OAUTH_MEMEBER_RESULT_URL);
+}
+
+// 소셜로그인 아이디가 사용 중이라면 알림
+$mb = get_member($member['mb_id'], 'mb_id');
+if($mb['mb_id']) {
+    reset_social_info();
+    alert_opener_url($mb['mb_id'].'는(은) 다른 회원이 사용 중이므로 로그인할 수 없습니다.', G5_URL);
 }
 ?>
 

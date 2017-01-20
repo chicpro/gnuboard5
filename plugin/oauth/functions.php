@@ -94,4 +94,13 @@ function is_social_connected($mb_id, $service)
 
     return $row['sm_id'] ? true : false;
 }
+
+function reset_social_info()
+{
+    unset($GLOBALS['member']);
+
+    set_session('ss_mb_id', '');
+    set_session('ss_oauth_member_'.get_session('ss_oauth_member_no').'_info', '');
+    set_session('ss_oauth_member_no', '');
+}
 ?>
