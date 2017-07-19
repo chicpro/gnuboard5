@@ -54,8 +54,19 @@ if($is_member && $req_mode == 'connect' && $req_service == $service) {
         $sql = " select sm_id from {$g5['social_member_table']} where sm_id = '{$member['mb_id']}' and mb_id = '{$mb['mb_id']}' and sm_service = '$service' ";
         $row = sql_fetch($sql);
 
-        if($row['sm_id'])
-            alert_opener_url();
+        if($row['sm_id']) {
+            //alert_opener_url();
+            echo '<script>'.PHP_EOL;
+            echo 'var popup = window.opener;'.PHP_EOL;
+            echo 'var url   = "";'.PHP_EOL;
+            echo 'if(popup.document.getElementsByName("url").length) {'.PHP_EOL;
+            echo '    url = decodeURIComponent(popup.document.getElementsByName("url")[0].value);'.PHP_EOL;
+            echo '    popup.location.href = url;'.PHP_EOL;
+            echo '}'.PHP_EOL;
+            echo 'window.close();'.PHP_EOL;
+            echo '</script>';
+            exit;
+        }
 
         // 연동정보 입력
         $sql = " insert into {$g5['social_member_table']}
@@ -120,8 +131,10 @@ if($g5['social_member_table']) {
             set_session('ss_oauth_member_'.get_session('ss_oauth_member_no').'_info', '');
             set_session('ss_oauth_member_no', '');
 
-            if($req_mode != 'connect')
-                alert_opener_url();
+            if($req_mode != 'connect') {
+                //alert_opener_url();
+                opener_url_reload();
+            }
 
             // 정보수정에서 연동일 때 처리
             echo '<script>'.PHP_EOL;
@@ -247,13 +260,6 @@ if($mb['mb_id']) {
     reset_social_info();
     alert_opener_url($mb['mb_id'].'는(은) 다른 회원이 사용 중이므로 로그인할 수 없습니다.', G5_URL);
 }
-?>
 
-<script>
-var popup = window.opener;
-var url   = "";
-if(popup.document.getElementsByName("url").length)
-    url = decodeURIComponent(popup.document.getElementsByName("url")[0].value);
-popup.location.href = url;
-window.close();
-</script>
+opener_url_reload();
+?>
