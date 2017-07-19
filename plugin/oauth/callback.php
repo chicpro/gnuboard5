@@ -148,7 +148,7 @@ if($g5['social_member_table']) {
 }
 
 // 회원가입처리
-if(defined('G5_OAUTH_MEMBER_REGISTER') && G5_OAUTH_MEMBER_REGISTER && $member['mb_id'] && $service != 'kakao') {
+if(defined('G5_OAUTH_MEMBER_REGISTER') && G5_OAUTH_MEMBER_REGISTER && $member['mb_id']) {
     if(defined('G5_OAUTH_MEMBER_REGISTER_SELECT') && G5_OAUTH_MEMBER_REGISTER_SELECT) {
         $mb_reg = get_session('ss_oauth_member_register');
         $mb = get_member($member['mb_id'], 'mb_id');
