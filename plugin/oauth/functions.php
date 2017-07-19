@@ -58,6 +58,22 @@ function alert_opener_url($msg='', $url=G5_URL)
     exit;
 }
 
+function opener_url_reload()
+{
+    echo '<script>'.PHP_EOL;
+    echo 'var popup = window.opener;'.PHP_EOL;
+    echo 'var url   = "";'.PHP_EOL;
+    echo 'if(popup.document.getElementsByName("url").length) {'.PHP_EOL;
+    echo '    url = decodeURIComponent(popup.document.getElementsByName("url")[0].value);'.PHP_EOL;
+    echo '    popup.location.href = url;'.PHP_EOL;
+    echo '} else {'.PHP_EOL;
+    echo '    popup.location.reload();'.PHP_EOL;
+    echo '}'.PHP_EOL;
+    echo 'window.close();'.PHP_EOL;
+    echo '</script>';
+    exit;
+}
+
 // http://php.net/manual/kr/function.base-convert.php#109660
 function str_baseconvert($str, $frombase=10, $tobase=36)
 {
