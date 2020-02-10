@@ -117,7 +117,7 @@ function goto_url($url)
 function set_session($session_name, $value)
 {
 	static $check_cookie = null;
-	
+
 	if( $check_cookie === null ){
 		$cookie_session_name = session_name();
 		if( ! ($cookie_session_name && isset($_COOKIE[$cookie_session_name]) && $_COOKIE[$cookie_session_name]) && ! headers_sent() ){
@@ -166,7 +166,7 @@ function alert($msg='', $url='', $error=true, $post=false)
 {
     global $g5, $config, $member;
     global $is_admin;
-    
+
     run_event('alert', $msg, $url, $error, $post);
 
     $msg = $msg ? strip_tags($msg, '<br>') : '올바른 방법으로 이용해 주십시오.';
@@ -184,7 +184,7 @@ function alert($msg='', $url='', $error=true, $post=false)
 function alert_close($msg, $error=true)
 {
     global $g5;
-    
+
     run_event('alert_close', $msg, $error);
 
     $msg = strip_tags($msg, '<br>');
@@ -766,7 +766,7 @@ function get_group($gr_id, $is_cache=false)
 function get_member($mb_id, $fields='*', $is_cache=false)
 {
     global $g5;
-    
+
     $mb_id = preg_replace("/[^0-9a-z_]+/i", "", $mb_id);
 
     static $cache = array();
@@ -1580,7 +1580,7 @@ function sql_query($sql, $error=G5_DISPLAY_SQL_ERROR, $link=null)
     $sql = preg_replace("#^select.*from.*where.*`?information_schema`?.*#i", "select 1", $sql);
 
     $is_debug = get_permission_debug_show();
-    
+
     $start_time = $is_debug ? get_microtime() : 0;
 
     if(function_exists('mysqli_query') && G5_MYSQLI_USE) {
@@ -2092,7 +2092,7 @@ function is_utf8($str)
 function utf8_strcut( $str, $size, $suffix='...' )
 {
     if( function_exists('mb_strlen') && function_exists('mb_substr') ){
-        
+
         if(mb_strlen($str)<=$size) {
             return $str;
         } else {
@@ -2145,7 +2145,7 @@ function sql_real_escape_string($str, $link=null)
 
     if(!$link)
         $link = $g5['connect_db'];
-    
+
     if(function_exists('mysqli_connect') && G5_MYSQLI_USE) {
         return mysqli_real_escape_string($link, $str);
     }
@@ -2468,27 +2468,27 @@ function html_end()
     return $html_process->run();
 }
 
-function add_stylesheet($stylesheet, $order=0)
+function add_stylesheet($stylesheet, $order=0, $ver='')
 {
     global $html_process;
 
     if(trim($stylesheet) && method_exists($html_process, 'merge_stylesheet') )
-        $html_process->merge_stylesheet($stylesheet, $order);
+        $html_process->merge_stylesheet($stylesheet, $order, $ver);
 }
 
-function add_javascript($javascript, $order=0)
+function add_javascript($javascript, $order=0, $ver='')
 {
     global $html_process;
 
     if(trim($javascript) && method_exists($html_process, 'merge_javascript') )
-        $html_process->merge_javascript($javascript, $order);
+        $html_process->merge_javascript($javascript, $order, $ver);
 }
 
 class html_process {
     protected $css = array();
     protected $js  = array();
 
-    function merge_stylesheet($stylesheet, $order)
+    function merge_stylesheet($stylesheet, $order, $ver)
     {
         $links = $this->css;
         $is_merge = true;
@@ -2501,10 +2501,10 @@ class html_process {
         }
 
         if($is_merge)
-            $this->css[] = array($order, $stylesheet);
+            $this->css[] = array($order, $stylesheet, $ver);
     }
 
-    function merge_javascript($javascript, $order)
+    function merge_javascript($javascript, $order, $ver)
     {
         $scripts = $this->js;
         $is_merge = true;
@@ -2517,7 +2517,7 @@ class html_process {
         }
 
         if($is_merge)
-            $this->js[] = array($order, $javascript);
+            $this->js[] = array($order, $javascript, $ver);
     }
 
     function run()
@@ -2557,14 +2557,15 @@ class html_process {
             }
 
             array_multisort($order, SORT_ASC, $index, SORT_ASC, $links);
-            
+
             $links = run_replace('html_process_css_files', $links);
 
             foreach($links as $link) {
                 if(!trim($link[1]))
                     continue;
 
-                $link[1] = preg_replace('#\.css([\'\"]?>)$#i', '.css?ver='.G5_CSS_VER.'$1', $link[1]);
+                if ($link[2])
+                    $link[1] = preg_replace('#\.css([\'\"]?>)$#i', '.css?ver='.$link[2].'$1', $link[1]);
 
                 $stylesheet .= PHP_EOL.$link[1];
             }
@@ -2585,14 +2586,15 @@ class html_process {
             }
 
             array_multisort($order, SORT_ASC, $index, SORT_ASC, $scripts);
-            
+
             $scripts = run_replace('html_process_script_files', $scripts);
 
             foreach($scripts as $js) {
                 if(!trim($js[1]))
                     continue;
 
-                $js[1] = preg_replace('#\.js([\'\"]?>)$#i', '.js?ver='.G5_JS_VER.'$1', $js[1]);
+                if ($js[2])
+                    $js[1] = preg_replace('#\.js([\'\"]?><\/script>)#i', '.js?ver='.$js[2].'$1', $js[1]);
 
                 $javascript .= $php_eol.$js[1];
                 $php_eol = PHP_EOL;
@@ -2615,9 +2617,9 @@ class html_process {
         if($javascript)
             $nl = "\n";
         $buffer = preg_replace('#(</head>[^<]*<body[^>]*>)#', "$javascript{$nl}$1", $buffer);
-        
+
         $meta_tag = run_replace('html_process_add_meta', '');
-        
+
         if( $meta_tag ){
             /*
             </title>content<body>
@@ -3012,11 +3014,11 @@ function get_search_string($stx)
 function clean_xss_tags($str, $check_entities=0)
 {
     $str_len = strlen($str);
-    
+
     $i = 0;
     while($i <= $str_len){
         $result = preg_replace('#</*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|i(?:frame|layer)|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|title|xml)[^>]*+>#i', '', $str);
-        
+
         if( $check_entities ){
             $result = str_replace(array('&colon;', '&lpar;', '&rpar;', '&NewLine;', '&Tab;'), '', $result);
         }
@@ -3128,7 +3130,7 @@ function replace_filename($name)
     $usec = get_microtime();
     $file_path = pathinfo($name);
     $ext = $file_path['extension'];
-    $return_filename = sha1($ss_id.$_SERVER['REMOTE_ADDR'].$usec); 
+    $return_filename = sha1($ss_id.$_SERVER['REMOTE_ADDR'].$usec);
     if( $ext )
         $return_filename .= '.'.$ext;
 
@@ -3202,7 +3204,7 @@ function login_password_check($mb, $pass, $hash)
                 $sql = "ALTER TABLE `{$g5['member_table']}` ADD `mb_password2` varchar(255) NOT NULL default '' AFTER `mb_password`";
                 sql_query($sql);
             }
-            
+
             $new_password = create_hash($pass);
             $sql = " update {$g5['member_table']} set mb_password = '$new_password', mb_password2 = '$hash' where mb_id = '$mb_id' ";
             sql_query($sql);
@@ -3222,7 +3224,7 @@ function check_url_host($url, $msg='', $return_url=G5_URL, $is_redirect=false)
     $p = @parse_url($url);
     $host = preg_replace('/:[0-9]+$/', '', $_SERVER['HTTP_HOST']);
     $is_host_check = false;
-    
+
     // url을 urlencode 를 2번이상하면 parse_url 에서 scheme와 host 값을 가져올수 없는 취약점이 존재함
     if ( $is_redirect && !isset($p['host']) && urldecode($url) != $url ){
         $i = 0;
@@ -3538,7 +3540,7 @@ function get_member_profile_img($mb_id='', $width='', $height='', $alt='profile_
 
     static $no_profile_cache = '';
     static $member_cache = array();
-    
+
     $src = '';
 
     if( $mb_id ){
@@ -3620,7 +3622,7 @@ function check_mail_bot($ip=''){
     //아이피를 체크하여 메일 크롤링을 방지합니다.
     $check_ips = array('211.249.40.');
     $bot_message = 'bot 으로 판단되어 중지합니다.';
-    
+
     if($ip){
         foreach( $check_ips as $c_ip ){
             if( preg_match('/^'.preg_quote($c_ip).'/', $ip) ) {
@@ -3631,13 +3633,13 @@ function check_mail_bot($ip=''){
 
     // user agent를 체크하여 메일 크롤링을 방지합니다.
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
-    if ($user_agent === 'Carbon' || strpos($user_agent, 'BingPreview') !== false || strpos($user_agent, 'Slackbot') !== false) { 
+    if ($user_agent === 'Carbon' || strpos($user_agent, 'BingPreview') !== false || strpos($user_agent, 'Slackbot') !== false) {
         die($bot_message);
-    } 
+    }
 }
 
 function get_call_func_cache($func, $args=array()){
-    
+
     static $cache = array();
 
     $key = md5(serialize($args));
@@ -3653,7 +3655,7 @@ function get_call_func_cache($func, $args=array()){
     } catch (Exception $e) {
         return null;
     }
-    
+
     return $result;
 }
 
@@ -3673,7 +3675,7 @@ function is_include_path_check($path='', $is_input='')
             if( stripos($path, 'rar:') !== false || stripos($path, 'php:') !== false || stripos($path, 'zlib:') !== false || stripos($path, 'bzip2:') !== false || stripos($path, 'zip:') !== false || stripos($path, 'data:') !== false || stripos($path, 'phar:') !== false || stripos($path, 'file:') !== false ){
                 return false;
             }
-            
+
             $replace_path = str_replace('\\', '/', $path);
             $slash_count = substr_count(str_replace('\\', '/', $_SERVER['SCRIPT_NAME']), '/');
             $peer_count = substr_count($replace_path, '../');
@@ -3733,7 +3735,7 @@ function is_include_path_check($path='', $is_input='')
         }
 
         $extension = pathinfo($path, PATHINFO_EXTENSION);
-        
+
         if($extension && preg_match('/(jpg|jpeg|png|gif|bmp|conf|php\-x)$/i', $extension)) {
             return false;
         }
