@@ -5,7 +5,7 @@
 ********************/
 
 define('G5_VERSION', '그누보드5');
-define('G5_GNUBOARD_VER', '5.2.9.8.3');
+define('G5_GNUBOARD_VER', '5.4.1.9');
 
 // 이 상수가 정의되지 않으면 각각의 개별 페이지는 별도로 실행될 수 없음
 define('_GNUBOARD_', true);
@@ -29,6 +29,16 @@ if (PHP_VERSION >= '5.1.0') {
 define('G5_DOMAIN', '');
 define('G5_HTTPS_DOMAIN', '');
 
+// 디버깅 상수, 실제 서버운영시 false 로 설정해 주제요.
+define('G5_DEBUG', false);
+
+// Set Databse table default engine is Databse default_storage_engine, If you want to use MyISAM or InnoDB, change to MyISAM or InnoDB.
+define('G5_DB_ENGINE', '');
+
+// Set Databse table default Charset
+// utf8, utf8mb4 등 지정 가능 기본값은 utf8, 설치전에 utf8mb4 으로 수정시 모든 테이블에 이모지 입력이 가능합니다. utf8mb4 는 mysql 또는 mariadb 5.5 버전 이상을 요구합니다.
+define('G5_DB_CHARSET', 'utf8');
+
 /*
 www.sir.kr 과 sir.kr 도메인은 서로 다른 도메인으로 인식합니다. 쿠키를 공유하려면 .sir.kr 과 같이 입력하세요.
 이곳에 입력이 없다면 www 붙은 도메인과 그렇지 않은 도메인은 쿠키를 공유하지 않으므로 로그인이 풀릴 수 있습니다.
@@ -47,7 +57,6 @@ define('G5_JS_DIR',         'js');
 define('G5_LIB_DIR',        'lib');
 define('G5_PLUGIN_DIR',     'plugin');
 define('G5_SKIN_DIR',       'skin');
-define('G5_CAPTCHA_DIR',    'kcaptcha');
 define('G5_EDITOR_DIR',     'editor');
 define('G5_MOBILE_DIR',     'mobile');
 define('G5_OKNAME_DIR',     'okname');
@@ -60,6 +69,9 @@ define('G5_SYNDI_DIR',      'syndi');
 define('G5_PHPMAILER_DIR',  'PHPMailer');
 define('G5_SESSION_DIR',    'session');
 define('G5_THEME_DIR',      'theme');
+
+define('G5_GROUP_DIR',      'group');
+define('G5_CONTENT_DIR',    'content');
 
 // URL 은 브라우저상에서의 경로 (도메인으로 부터의)
 if (G5_DOMAIN) {
@@ -85,7 +97,6 @@ define('G5_IMG_URL',        G5_URL.'/'.G5_IMG_DIR);
 define('G5_JS_URL',         G5_URL.'/'.G5_JS_DIR);
 define('G5_SKIN_URL',       G5_URL.'/'.G5_SKIN_DIR);
 define('G5_PLUGIN_URL',     G5_URL.'/'.G5_PLUGIN_DIR);
-define('G5_CAPTCHA_URL',    G5_PLUGIN_URL.'/'.G5_CAPTCHA_DIR);
 define('G5_EDITOR_URL',     G5_PLUGIN_URL.'/'.G5_EDITOR_DIR);
 define('G5_OKNAME_URL',     G5_PLUGIN_URL.'/'.G5_OKNAME_DIR);
 define('G5_KCPCERT_URL',    G5_PLUGIN_URL.'/'.G5_KCPCERT_DIR);
@@ -104,7 +115,6 @@ define('G5_PLUGIN_PATH',    G5_PATH.'/'.G5_PLUGIN_DIR);
 define('G5_SKIN_PATH',      G5_PATH.'/'.G5_SKIN_DIR);
 define('G5_MOBILE_PATH',    G5_PATH.'/'.G5_MOBILE_DIR);
 define('G5_SESSION_PATH',   G5_DATA_PATH.'/'.G5_SESSION_DIR);
-define('G5_CAPTCHA_PATH',   G5_PLUGIN_PATH.'/'.G5_CAPTCHA_DIR);
 define('G5_EDITOR_PATH',    G5_PLUGIN_PATH.'/'.G5_EDITOR_DIR);
 define('G5_OKNAME_PATH',    G5_PLUGIN_PATH.'/'.G5_OKNAME_DIR);
 
@@ -150,12 +160,15 @@ define('G5_HANGUL',         16); // 한글
 define('G5_SPACE',          32); // 공백
 define('G5_SPECIAL',        64); // 특수문자
 
+// SEO TITLE 문단 길이
+define('G5_SEO_TITEL_WORD_CUT', 8);        // SEO TITLE 문단 길이
+
 // 퍼미션
 define('G5_DIR_PERMISSION',  0755); // 디렉토리 생성시 퍼미션
 define('G5_FILE_PERMISSION', 0644); // 파일 생성시 퍼미션
 
 // 모바일 인지 결정 $_SERVER['HTTP_USER_AGENT']
-define('G5_MOBILE_AGENT',   'phone|samsung|lgtel|mobile|[^A]skt|nokia|blackberry|android|sony');
+define('G5_MOBILE_AGENT',   'phone|samsung|lgtel|mobile|[^A]skt|nokia|blackberry|BB10|android|sony');
 
 // SMTP
 // lib/mailer.lib.php 에서 사용
@@ -169,7 +182,10 @@ define('G5_SMTP_PORT', '25');
 
 // 암호화 함수 지정
 // 사이트 운영 중 설정을 변경하면 로그인이 안되는 등의 문제가 발생합니다.
-define('G5_STRING_ENCRYPT_FUNCTION', 'sql_password');
+// 5.4 버전 이전에는 sql_password 이 사용됨, 5.4 버전부터 기본이 create_hash 로 변경
+//define('G5_STRING_ENCRYPT_FUNCTION', 'sql_password');
+define('G5_STRING_ENCRYPT_FUNCTION', 'create_hash');
+define('G5_MYSQL_PASSWORD_LENGTH', 41);         // mysql password length 41, old_password 의 경우에는 16
 
 // SQL 에러를 표시할 것인지 지정
 // 에러를 표시하려면 TRUE 로 변경

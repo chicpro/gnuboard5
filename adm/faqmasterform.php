@@ -21,6 +21,7 @@ if ($w == "u")
 else
 {
     $html_title .= ' 입력';
+    $fm = array();
 }
 
 $g5['title'] = $html_title.' 관리';
@@ -116,34 +117,34 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
     <tr>
         <th scope="row">상단 내용</th>
         <td>
-            <?php echo editor_html('fm_head_html', get_text($fm['fm_head_html'], 0)); ?>
+            <?php echo editor_html('fm_head_html', get_text(html_purifier($fm['fm_head_html']), 0)); ?>
         </td>
     </tr>
     <tr>
         <th scope="row">하단 내용</th>
         <td>
-            <?php echo editor_html('fm_tail_html', get_text($fm['fm_tail_html'], 0)); ?>
+            <?php echo editor_html('fm_tail_html', get_text(html_purifier($fm['fm_tail_html']), 0)); ?>
         </td>
     </tr>
     <tr>
         <th scope="row">모바일상단 내용</th>
         <td>
-            <?php echo editor_html('fm_mobile_head_html', get_text($fm['fm_mobile_head_html'], 0)); ?>
+            <?php echo editor_html('fm_mobile_head_html', get_text(html_purifier($fm['fm_mobile_head_html']), 0)); ?>
         </td>
     </tr>
     <tr>
         <th scope="row">모바일하단 내용</th>
         <td>
-            <?php echo editor_html('fm_mobile_tail_html', get_text($fm['fm_mobile_tail_html'], 0)); ?>
+            <?php echo editor_html('fm_mobile_tail_html', get_text(html_purifier($fm['fm_mobile_tail_html']), 0)); ?>
         </td>
     </tr>
     </tbody>
     </table>
 </div>
 
-<div class="btn_confirm01 btn_confirm">
-    <input type="submit" value="확인" class="btn_submit" accesskey="s">
-    <a href="./faqmasterlist.php">목록</a>
+<div class="btn_fixed_top">
+    <a href="./faqmasterlist.php" class="btn btn_02">목록</a>
+    <input type="submit" value="확인" class="btn_submit btn" accesskey="s">
 </div>
 
 </form>

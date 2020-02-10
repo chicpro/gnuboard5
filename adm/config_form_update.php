@@ -24,6 +24,18 @@ if(!$_POST['cf_cert_use']) {
     $_POST['cf_cert_hp'] = '';
 }
 
+$cf_social_servicelist = !empty($_POST['cf_social_servicelist']) ? implode(',', $_POST['cf_social_servicelist']) : '';
+
+$_POST['cf_title'] = strip_tags($_POST['cf_title']);
+
+$check_keys = array('cf_lg_mid', 'cf_lg_mert_key', 'cf_cert_kcb_cd', 'cf_cert_kcp_cd', 'cf_editor', 'cf_recaptcha_site_key', 'cf_recaptcha_secret_key', 'cf_naver_clientid', 'cf_naver_secret', 'cf_facebook_appid', 'cf_facebook_secret', 'cf_twitter_key', 'cf_twitter_secret', 'cf_google_clientid', 'cf_google_secret', 'cf_googl_shorturl_apikey', 'cf_kakao_rest_key', 'cf_kakao_client_secret', 'cf_kakao_js_apikey', 'cf_payco_clientid', 'cf_payco_secret');
+
+foreach( $check_keys as $key ){
+    if ( isset($_POST[$key]) && $_POST[$key] ){
+        $_POST[$key] = preg_replace('/[^a-z0-9_\-\.]/i', '', $_POST[$key]);
+    }
+}
+
 $sql = " update {$g5['config_table']}
             set cf_title = '{$_POST['cf_title']}',
                 cf_admin = '{$_POST['cf_admin']}',
@@ -57,6 +69,7 @@ $sql = " update {$g5['config_table']}
                 cf_add_meta = '{$_POST['cf_add_meta']}',
                 cf_syndi_token = '{$_POST['cf_syndi_token']}',
                 cf_syndi_except = '{$_POST['cf_syndi_except']}',
+                cf_bbs_rewrite = '{$_POST['cf_bbs_rewrite']}',
                 cf_member_skin = '{$_POST['cf_member_skin']}',
                 cf_use_homepage = '{$_POST['cf_use_homepage']}',
                 cf_req_homepage = '{$_POST['cf_req_homepage']}',
@@ -96,6 +109,9 @@ $sql = " update {$g5['config_table']}
                 cf_member_icon_size = '{$_POST['cf_member_icon_size']}',
                 cf_member_icon_width = '{$_POST['cf_member_icon_width']}',
                 cf_member_icon_height = '{$_POST['cf_member_icon_height']}',
+                cf_member_img_size = '{$_POST['cf_member_img_size']}',
+                cf_member_img_width = '{$_POST['cf_member_img_width']}',
+                cf_member_img_height = '{$_POST['cf_member_img_height']}',
                 cf_login_minutes = '{$_POST['cf_login_minutes']}',
                 cf_image_extension = '{$_POST['cf_image_extension']}',
                 cf_flash_extension = '{$_POST['cf_flash_extension']}',
@@ -135,6 +151,19 @@ $sql = " update {$g5['config_table']}
                 cf_facebook_secret = '{$_POST['cf_facebook_secret']}',
                 cf_twitter_key = '{$_POST['cf_twitter_key']}',
                 cf_twitter_secret = '{$_POST['cf_twitter_secret']}',
+                cf_social_login_use = '{$_POST['cf_social_login_use']}',
+                cf_naver_clientid = '{$_POST['cf_naver_clientid']}',
+                cf_naver_secret = '{$_POST['cf_naver_secret']}',
+                cf_google_clientid = '{$_POST['cf_google_clientid']}',
+                cf_google_secret = '{$_POST['cf_google_secret']}',
+                cf_kakao_rest_key = '{$_POST['cf_kakao_rest_key']}',
+                cf_kakao_client_secret = '{$_POST['cf_kakao_client_secret']}',
+                cf_social_servicelist   =   '{$cf_social_servicelist}',
+                cf_captcha = '{$_POST['cf_captcha']}',
+                cf_recaptcha_site_key = '{$_POST['cf_recaptcha_site_key']}',
+                cf_recaptcha_secret_key   =   '{$_POST['cf_recaptcha_secret_key']}',
+                cf_payco_clientid = '{$_POST['cf_payco_clientid']}',
+                cf_payco_secret = '{$_POST['cf_payco_secret']}',
                 cf_1_subj = '{$_POST['cf_1_subj']}',
                 cf_2_subj = '{$_POST['cf_2_subj']}',
                 cf_3_subj = '{$_POST['cf_3_subj']}',
@@ -158,6 +187,14 @@ $sql = " update {$g5['config_table']}
 sql_query($sql);
 
 //sql_query(" OPTIMIZE TABLE `$g5[config_table]` ");
+
+if( isset($_POST['cf_bbs_rewrite']) ){
+    g5_delete_all_cache();
+}
+
+run_event('admin_config_form_update');
+
+update_rewrite_rules();
 
 goto_url('./config_form.php', false);
 ?>

@@ -8,88 +8,61 @@ add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
 
 <script src="<?php echo G5_JS_URL; ?>/viewimageresize.js"></script>
 
-<!-- 게시물 읽기 시작 { -->
-<div id="bo_v_table"><?php echo $qaconfig['qa_title']; ?></div>
-
-<article id="bo_v">
-    <header>
-        <h1 id="bo_v_title">
-            <?php
-            echo $view['category'].' | '; // 분류 출력 끝
-            echo $view['subject']; // 글제목 출력
-            ?>
-        </h1>
-    </header>
-
-    <section id="bo_v_info">
-        <h2>페이지 정보</h2>
-        작성자 <strong><?php echo $view['name'] ?></strong>
-        <span class="sound_only">작성일</span><strong><?php echo $view['datetime']; ?></strong>
-    </section>
-
-    <?php if($view['download_count']) { ?>
-    <!-- 첨부파일 시작 { -->
-    <section id="bo_v_file">
-        <h2>첨부파일</h2>
-        <ul>
-        <?php
-        // 가변 파일
-        for ($i=0; $i<$view['download_count']; $i++) {
-         ?>
-            <li>
-                <a href="<?php echo $view['download_href'][$i];  ?>" class="view_file_download">
-                    <img src="<?php echo $qa_skin_url ?>/img/icon_file.gif" alt="첨부">
-                    <strong><?php echo $view['download_source'][$i] ?></strong>
-                </a>
-            </li>
-        <?php
-        }
-         ?>
-        </ul>
-    </section>
-    <!-- } 첨부파일 끝 -->
+<ul class="btn_top top btn_bo_user"> 
+	<li><a href="<?php echo $list_href ?>" class="btn_b03 btn"><i class="fa fa-list" aria-hidden="true"></i><span class="sound_only">목록</span></a></li>
+    <?php if ($write_href) { ?>
+    <li><a href="<?php echo $write_href ?>" class="btn_b03 btn"><i class="fa fa-pencil" aria-hidden="true"></i><span class="sound_only">글쓰기</a></li>
     <?php } ?>
-
-    <?php if($view['email'] || $view['hp']) { ?>
-    <section id="bo_v_contact">
-        <h2>연락처정보</h2>
-        <dl>
-            <?php if($view['email']) { ?>
-            <dt>이메일</dt>
-            <dd><?php echo $view['email']; ?></dd>
-            <?php } ?>
-            <?php if($view['hp']) { ?>
-            <dt>휴대폰</dt>
-            <dd><?php echo $view['hp']; ?></dd>
-            <?php } ?>
-        </dl>
-    </section>
-    <?php } ?>
-
-    <!-- 게시물 상단 버튼 시작 { -->
-    <div id="bo_v_top">
-        <?php
-        ob_start();
-         ?>
-        <?php if ($prev_href || $next_href) { ?>
-        <ul class="bo_v_nb">
-            <?php if ($prev_href) { ?><li><a href="<?php echo $prev_href ?>" class="btn_b01">이전글</a></li><?php } ?>
-            <?php if ($next_href) { ?><li><a href="<?php echo $next_href ?>" class="btn_b01">다음글</a></li><?php } ?>
-        </ul>
-        <?php } ?>
-
-        <ul class="bo_v_com">
-            <?php if ($update_href) { ?><li><a href="<?php echo $update_href ?>" class="btn_b01">수정</a></li><?php } ?>
-            <?php if ($delete_href) { ?><li><a href="<?php echo $delete_href ?>" class="btn_b01" onclick="del(this.href); return false;">삭제</a></li><?php } ?>
-            <li><a href="<?php echo $list_href ?>" class="btn_b01">목록</a></li>
-            <?php if ($write_href) { ?><li><a href="<?php echo $write_href ?>" class="btn_b02">글쓰기</a></li><?php } ?>
-        </ul>
-        <?php
+	<li>
+		<button type="button" class="btn_more_opt btn_b03 btn"><i class="fa fa-ellipsis-v" aria-hidden="true"></i><span class="sound_only">게시판 리스트 옵션</span></button>
+    	<?php ob_start(); ?>
+        <ul class="more_opt">
+        	<?php if ($delete_href) { ?><li><a href="<?php echo $delete_href ?>" onclick="del(this.href); return false;"><i class="fa fa-trash-o" aria-hidden="true"></i> 삭제</a></li><?php } ?>
+			<?php if ($update_href) { ?><li><a href="<?php echo $update_href ?>"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 수정</a></li><?php } ?>
+		</ul>
+		<?php
         $link_buttons = ob_get_contents();
         ob_end_flush();
-         ?>
-    </div>
-    <!-- } 게시물 상단 버튼 끝 -->
+		?>
+	</li>
+</ul>
+<script>
+// 글쓰기 관리자 옵션
+$(".btn_more_opt").on("click", function() {
+    $(".more_opt").toggle();
+})
+</script>
+    
+<!-- 게시물 읽기 시작 { -->
+<article id="bo_v">
+    <header>
+        <h2 id="bo_v_title">
+            <span class="bo_v_cate"><?php echo $view['category'] ; // 분류 출력 끝 ?></span>
+            <span class="bo_v_tit"><?php echo $view['subject']; // 글제목 출력  ?></span>
+        </h2>
+        <div id="bo_v_info">
+	        <h2>페이지 정보</h2>
+	        <span class="sound_only">작성자</span><strong><?php echo $view['name'] ?></strong>
+	        <span class="sound_only">작성일</span><strong><i class="fa fa-clock-o" aria-hidden="true"></i> <?php echo $view['datetime']; ?></strong>
+	    	<span class="sound_only">조회</span><strong><i class="fa fa-eye" aria-hidden="true"></i> <?php echo number_format($view['wr_hit']) ?></strong>
+			<span class="sound_only">댓글</span><strong><i class="fa fa-commenting-o" aria-hidden="true"></i> <?php echo number_format($view['wr_comment']) ?></strong>
+		</div>
+		<?php if($view['email'] || $view['hp']) { ?>
+        <div id="bo_v_contact">
+            <h2>연락처정보</h2>
+            <dl>
+                <?php if($view['email']) { ?>
+                <dt><i class="fa fa-envelope-o" aria-hidden="true"></i><span class="sound_only">이메일</span></dt>
+                <dd><?php echo $view['email']; ?></dd>
+                <?php } ?>
+                <?php if($view['hp']) { ?>
+                <dt><i class="fa fa fa-phone" aria-hidden="true"></i><span class="sound_only">휴대폰</span></dt>
+                <dd><?php echo $view['hp']; ?></dd>
+                <?php } ?>
+            </dl>
+        </div>
+        <?php } ?>
+    </header>
 
     <section id="bo_v_atc">
         <h2 id="bo_v_atc_title">본문</h2>
@@ -106,7 +79,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
 
             echo "</div>\n";
         }
-         ?>
+		?>
 
         <!-- 본문 내용 시작 { -->
         <div id="bo_v_con"><?php echo get_view_thumbnail($view['content'], $qaconfig['qa_image_width']); ?></div>
@@ -116,64 +89,80 @@ add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
         <div><a href="<?php echo $rewrite_href; ?>" class="btn_b01">추가질문</a></div>
         <?php } ?>
 
-    </section>
-
-    <?php
-    // 질문글에서 답변이 있으면 답변 출력, 답변이 없고 관리자이면 답변등록폼 출력
-    if(!$view['qa_type']) {
-        if($view['qa_status'] && $answer['qa_id'])
-            include_once($qa_skin_path.'/view.answer.skin.php');
-        else
-            include_once($qa_skin_path.'/view.answerform.skin.php');
-    }
-    ?>
-
-    <?php if($view['rel_count']) { ?>
-    <section id="bo_v_rel">
-        <h2>연관질문</h2>
-
-        <div class="tbl_head01 tbl_wrap">
-            <table>
-            <thead>
-            <tr>
-                <th scope="col">분류</th>
-                <th scope="col">제목</th>
-                <th scope="col">상태</th>
-                <th scope="col">등록일</th>
-            </tr>
-            </thead>
-            <tbody>
+        <?php if($view['download_count']) { ?>
+        <!-- 첨부파일 시작 { -->
+        <section id="bo_v_file">
+            <h2>첨부파일</h2>
+            <ul>
             <?php
-            for($i=0; $i<$view['rel_count']; $i++) {
-            ?>
-            <tr>
-                <td class="td_category"><?php echo get_text($rel_list[$i]['category']); ?></td>
-                <td>
-                    <a href="<?php echo $rel_list[$i]['view_href']; ?>">
-                        <?php echo $rel_list[$i]['subject']; ?>
+            // 가변 파일
+            for ($i=0; $i<$view['download_count']; $i++) {
+             ?>
+                <li>
+                    <a href="<?php echo $view['download_href'][$i];  ?>" class="view_file_download">
+                        <img src="<?php echo $qa_skin_url ?>/img/icon_file.gif" alt="첨부">
+                        <strong><?php echo $view['download_source'][$i] ?></strong>
                     </a>
-                </td>
-                <td class="td_stat <?php echo ($list[$i]['qa_status'] ? 'txt_done' : 'txt_rdy'); ?>"><?php echo ($rel_list[$i]['qa_status'] ? '답변완료' : '답변대기'); ?></td>
-                <td class="td_date"><?php echo $rel_list[$i]['date']; ?></td>
-            </tr>
+                </li>
             <?php
             }
-            ?>
-            </tbody>
-            </table>
-        </div>
+             ?>
+            </ul>
+        </section>
+        <!-- } 첨부파일 끝 -->
+        <?php } ?>
     </section>
+    
+    <?php if ($prev_href || $next_href) { ?>
+    <ul class="bo_v_nb">
+        <?php if ($prev_href) { ?><li class="bo_v_prev"><a href="<?php echo $prev_href ?>"><i class="fa fa-chevron-up" aria-hidden="true"></i><span class="sound_only">이전글</span> <?php echo $prev_wr_subject;?></a></li><?php } ?>
+        <?php if ($next_href) { ?><li class="bo_v_next"><a href="<?php echo $next_href ?>"><i class="fa fa-chevron-down" aria-hidden="true"></i><span class="sound_only">다음글</span> <?php echo $next_wr_subject;?></a></li><?php } ?>
+    </ul>
     <?php } ?>
-
-    <!-- 링크 버튼 시작 { -->
-    <div id="bo_v_bot">
-        <?php echo $link_buttons ?>
-    </div>
-    <!-- } 링크 버튼 끝 -->
-
 </article>
 <!-- } 게시판 읽기 끝 -->
 
+<?php
+// 질문글에서 답변이 있으면 답변 출력, 답변이 없고 관리자이면 답변등록폼 출력
+if(!$view['qa_type']) {
+    if($view['qa_status'] && $answer['qa_id'])
+        include_once($qa_skin_path.'/view.answer.skin.php');
+    else
+        include_once($qa_skin_path.'/view.answerform.skin.php');
+}
+?>
+
+<?php if($view['rel_count']) { ?>
+<section id="bo_v_rel">
+    <h2>연관질문</h2>
+
+    <div class="list_01">
+
+        <ul>
+        <?php
+            for($i=0; $i<$view['rel_count']; $i++) {
+            ?>
+            <li>
+                <div class="li_title">
+                    <strong><?php echo get_text($rel_list[$i]['category']); ?></strong>
+                
+                    <a href="<?php echo $rel_list[$i]['view_href']; ?>" class="li_sbj">
+                        <?php echo $rel_list[$i]['subject']; ?>
+                    </a>
+                </div>
+                <div class="li_info">
+                    <span class="li_stat <?php echo ($rel_list[$i]['qa_status'] ? 'txt_done' : 'txt_rdy'); ?>"><?php echo ($rel_list[$i]['qa_status'] ? '답변완료' : '답변대기'); ?></span>
+                    <span class="li_date"><?php echo $rel_list[$i]['date']; ?></span>
+                </div>
+            </li>
+            <?php
+            }
+            ?>
+        </ul>
+    </div>
+</section>
+<?php } ?>
+    
 <script>
 $(function() {
     $("a.view_image").click(function() {

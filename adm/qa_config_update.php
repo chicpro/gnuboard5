@@ -10,19 +10,39 @@ check_admin_token();
 
 $error_msg = '';
 
+$qaconfig = get_qa_config();
+
+$check_keys = array('qa_title', 'qa_category', 'qa_skin', 'qa_mobile_skin', 'qa_use_email', 'qa_req_email', 'qa_use_hp', 'qa_req_hp', 'qa_use_sms', 'qa_send_number', 'qa_admin_hp', 'qa_admin_email', 'qa_subject_len', 'qa_mobile_subject_len', 'qa_page_rows', 'qa_mobile_page_rows', 'qa_image_width', 'qa_upload_size');
+
+foreach($check_keys as $key){
+	$$key = $_POST[$key] = isset($_POST[$key]) ? strip_tags($_POST[$key]) : '';
+}
+
+$qa_include_head = preg_replace(array("#[\\\]+$#", "#(<\?php|<\?)#i"), "", substr($qa_include_head, 0, 255));
+$qa_include_tail = preg_replace(array("#[\\\]+$#", "#(<\?php|<\?)#i"), "", substr($qa_include_tail, 0, 255));
+
+// 관리자가 자동등록방지를 사용해야 할 경우
+if ($board && ($qaconfig['qa_include_head'] !== $qa_include_head || $qaconfig['qa_include_tail'] !== $qa_include_tail) && function_exists('get_admin_captcha_by') && get_admin_captcha_by()){
+    include_once(G5_CAPTCHA_PATH.'/captcha.lib.php');
+
+    if (!chk_captcha()) {
+        alert('자동등록방지 숫자가 틀렸습니다.');
+    }
+}
+
 if( $qa_include_head ){
     $file_ext = pathinfo($qa_include_head, PATHINFO_EXTENSION);
 
-    if( ! $file_ext || ! in_array($file_ext, array('php', 'htm', 'html')) ) {
-        alert('상단 파일 경로의 확장자는 php, html 만 허용합니다.');
+    if( ! $file_ext || ! in_array($file_ext, array('php', 'htm', 'html')) || ! preg_match('/^.*\.(php|htm|html)$/i', $qa_include_head) ) {
+        alert('상단 파일 경로의 확장자는 php, htm, html 만 허용합니다.');
     }
 }
 
 if( $qa_include_tail ){
     $file_ext = pathinfo($qa_include_tail, PATHINFO_EXTENSION);
 
-    if( ! $file_ext || ! in_array($file_ext, array('php', 'htm', 'html')) ) {
-        alert('하단 파일 경로의 확장자는 php, html 만 허용합니다.');
+    if( ! $file_ext || ! in_array($file_ext, array('php', 'htm', 'html')) || ! preg_match('/^.*\.(php|htm|html)$/i', $qa_include_tail) ) {
+        alert('하단 파일 경로의 확장자는 php, htm, html 만 허용합니다.');
     }
 }
 
@@ -74,6 +94,9 @@ $sql = " update {$g5['qa_config_table']}
                 qa_4                    = '{$_POST['qa_4']}',
                 qa_5                    = '{$_POST['qa_5']}' ";
 sql_query($sql);
+
+if(function_exists('get_admin_captcha_by'))
+    get_admin_captcha_by('remove');
 
 if($error_msg){
     alert($error_msg, './qa_config.php');

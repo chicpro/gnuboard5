@@ -5,6 +5,9 @@ include_once(G5_EDITOR_LIB);
 
 auth_check($auth[$sub_menu], "w");
 
+$fm_id = (int) $fm_id;
+$fa_id = isset($fa_id) ? (int) $fa_id : 0;
+
 $sql = " select * from {$g5['faq_master_table']} where fm_id = '$fm_id' ";
 $fm = sql_fetch($sql);
 
@@ -51,19 +54,19 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
     </tr>
     <tr>
         <th scope="row">질문</th>
-        <td><?php echo editor_html('fa_subject', get_text($fa['fa_subject'], 0)); ?></td>
+        <td><?php echo editor_html('fa_subject', get_text(html_purifier($fa['fa_subject']), 0)); ?></td>
     </tr>
     <tr>
         <th scope="row">답변</th>
-        <td><?php echo editor_html('fa_content', get_text($fa['fa_content'], 0)); ?></td>
+        <td><?php echo editor_html('fa_content', get_text(html_purifier($fa['fa_content']), 0)); ?></td>
     </tr>
     </tbody>
     </table>
 </div>
 
-<div class="btn_confirm01 btn_confirm">
-    <input type="submit" value="확인" class="btn_submit" accesskey="s">
-    <a href="./faqlist.php?fm_id=<?php echo $fm_id; ?>">목록</a>
+<div class="btn_fixed_top">
+    <input type="submit" value="확인" class="btn_submit btn" accesskey="s">
+    <a href="./faqlist.php?fm_id=<?php echo $fm_id; ?>" class="btn btn_02">목록</a>
 </div>
 
 </form>

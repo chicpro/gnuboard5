@@ -11,26 +11,12 @@ header('Pragma: no-cache'); // HTTP/1.0
 
 include_once ('../config.php');
 include_once ('../lib/common.lib.php');
+include_once('./install.function.php');    // 인스톨 과정 함수 모음
 
-if( ! function_exists('safe_install_string_check') ){
-    function safe_install_string_check( $str ) {
-        $is_check = false;
-
-        if(preg_match('#\);(passthru|eval|pcntl_exec|exec|system|popen|fopen|fsockopen|file|file_get_contents|readfile|unlink|include|include_once|require|require_once)\s?#i', $str)) {
-            $is_check = true;
-        }
-
-        if(preg_match('#\$_(get|post|request)\s?\[.*?\]\s?\)#i', $str)){
-            $is_check = true;
-        }
-
-        if($is_check){
-            die("입력한 값에 안전하지 않는 문자가 포함되어 있습니다. 설치를 중단합니다.");
-        }
-
-        return $str;
-    }
-}
+include_once('../lib/hook.lib.php');    // hook 함수 파일
+include_once('../lib/get_data.lib.php');    
+include_once('../lib/uri.lib.php');    // URL 함수 파일
+include_once('../lib/cache.lib.php');
 
 $title = G5_VERSION." 설치 완료 3/3";
 include_once ('./install.inc.php');
@@ -46,6 +32,10 @@ $admin_id    = $_POST['admin_id'];
 $admin_pass  = $_POST['admin_pass'];
 $admin_name  = $_POST['admin_name'];
 $admin_email = $_POST['admin_email'];
+
+if (preg_match("/[^0-9a-z_]+/i", $admin_id)) {
+    die('<div class="ins_inner"><p>관리자 아이디는 영문자, 숫자, _ 만 입력하세요.</p><div class="inner_btn"><a href="./install_config.php">뒤로가기</a></div></div>');
+}
 
 $dblink = sql_connect($mysql_host, $mysql_user, $mysql_pass, $mysql_db);
 if (!$dblink) {
@@ -76,7 +66,7 @@ if (!$select_db) {
 }
 
 $mysql_set_mode = 'false';
-sql_set_charset('utf8', $dblink);
+sql_set_charset(G5_DB_CHARSET, $dblink);
 $result = sql_query(" SELECT @@sql_mode as mode ", true, $dblink);
 $row = sql_fetch_array($result);
 if($row['mode']) {
@@ -101,7 +91,10 @@ $file = preg_replace('/`g5_([^`]+`)/', '`'.$table_prefix.'$1', $file);
 $f = explode(';', $file);
 for ($i=0; $i<count($f); $i++) {
     if (trim($f[$i]) == '') continue;
-    sql_query($f[$i], true, $dblink);
+
+    $sql = get_db_create_replace($f[$i]);
+
+    sql_query($sql, true, $dblink);
 }
 // 테이블 생성 ------------------------------------
 ?>
@@ -169,6 +162,9 @@ $sql = " insert into `{$table_prefix}config`
                 cf_member_icon_size = '5000',
                 cf_member_icon_width = '22',
                 cf_member_icon_height = '22',
+                cf_member_img_size = '50000',
+                cf_member_img_width = '60',
+                cf_member_img_height = '60',
                 cf_login_minutes = '10',
                 cf_image_extension = 'gif|jpg|jpeg|png',
                 cf_flash_extension = 'swf',
@@ -192,7 +188,7 @@ sql_query($sql, true, $dblink);
 // 관리자 회원가입
 $sql = " insert into `{$table_prefix}member`
             set mb_id = '$admin_id',
-                 mb_password = PASSWORD('$admin_pass'),
+                 mb_password = '".get_encrypt_string($admin_pass)."',
                  mb_name = '$admin_name',
                  mb_nick = '$admin_name',
                  mb_email = '$admin_email',
@@ -206,12 +202,106 @@ $sql = " insert into `{$table_prefix}member`
 sql_query($sql, true, $dblink);
 
 // 내용관리 생성
-sql_query(" insert into `{$table_prefix}content` set co_id = 'company', co_html = '1', co_subject = '회사소개', co_content= '<p align=center><b>회사소개에 대한 내용을 입력하십시오.</b></p>' ", true, $dblink);
-sql_query(" insert into `{$table_prefix}content` set co_id = 'privacy', co_html = '1', co_subject = '개인정보 처리방침', co_content= '<p align=center><b>개인정보 처리방침에 대한 내용을 입력하십시오.</b></p>' ", true, $dblink);
-sql_query(" insert into `{$table_prefix}content` set co_id = 'provision', co_html = '1', co_subject = '서비스 이용약관', co_content= '<p align=center><b>서비스 이용약관에 대한 내용을 입력하십시오.</b></p>' ", true, $dblink);
+sql_query(" insert into `{$table_prefix}content` set co_id = 'company', co_html = '1', co_subject = '회사소개', co_seo_title = '".generate_seo_title('회사소개')."', co_content= '<p align=center><b>회사소개에 대한 내용을 입력하십시오.</b></p>' ", true, $dblink);
+sql_query(" insert into `{$table_prefix}content` set co_id = 'privacy', co_html = '1', co_subject = '개인정보 처리방침', co_seo_title = '".generate_seo_title('개인정보 처리방침')."', co_content= '<p align=center><b>개인정보 처리방침에 대한 내용을 입력하십시오.</b></p>' ", true, $dblink);
+sql_query(" insert into `{$table_prefix}content` set co_id = 'provision', co_html = '1', co_subject = '서비스 이용약관', co_seo_title = '".generate_seo_title('서비스 이용약관')."', co_content= '<p align=center><b>서비스 이용약관에 대한 내용을 입력하십시오.</b></p>' ", true, $dblink);
 
 // FAQ Master
 sql_query(" insert into `{$table_prefix}faq_master` set fm_id = '1', fm_subject = '자주하시는 질문' ", true, $dblink);
+
+$tmp_gr_id = defined('G5_YOUNGCART_VER') ? 'shop' : 'community';
+$tmp_gr_subject = defined('G5_YOUNGCART_VER') ? '쇼핑몰' : '커뮤니티';
+
+// 게시판 그룹 생성
+sql_query(" insert into `{$table_prefix}group` set gr_id = '$tmp_gr_id', gr_subject = '$tmp_gr_subject' ", true, $dblink);
+
+// 게시판 생성
+$tmp_bo_table   = array ("notice", "qa", "free", "gallery");
+$tmp_bo_subject = array ("공지사항", "질문답변", "자유게시판", "갤러리");
+for ($i=0; $i<count($tmp_bo_table); $i++)
+{
+
+    $bo_skin = ($tmp_bo_table[$i] === 'gallery') ? 'gallery' : 'basic';
+
+    $sql = " insert into `{$table_prefix}board`
+                set bo_table = '$tmp_bo_table[$i]',
+                    gr_id = '$tmp_gr_id',
+                    bo_subject = '$tmp_bo_subject[$i]',
+                    bo_device           = 'both',
+                    bo_admin            = '',
+                    bo_list_level       = '1',
+                    bo_read_level       = '1',
+                    bo_write_level      = '1',
+                    bo_reply_level      = '1',
+                    bo_comment_level    = '1',
+                    bo_html_level       = '1',
+                    bo_link_level       = '1',
+                    bo_count_modify     = '1',
+                    bo_count_delete     = '1',
+                    bo_upload_level     = '1',
+                    bo_download_level   = '1',
+                    bo_read_point       = '-1',
+                    bo_write_point      = '5',
+                    bo_comment_point    = '1',
+                    bo_download_point   = '-20',
+                    bo_use_category     = '0',
+                    bo_category_list    = '',
+                    bo_use_sideview     = '0',
+                    bo_use_file_content = '0',
+                    bo_use_secret       = '0',
+                    bo_use_dhtml_editor = '0',
+                    bo_use_rss_view     = '0',
+                    bo_use_good         = '0',
+                    bo_use_nogood       = '0',
+                    bo_use_name         = '0',
+                    bo_use_signature    = '0',
+                    bo_use_ip_view      = '0',
+                    bo_use_list_view    = '0',
+                    bo_use_list_content = '0',
+                    bo_use_email        = '0',
+                    bo_table_width      = '100',
+                    bo_subject_len      = '60',
+                    bo_mobile_subject_len      = '30',
+                    bo_page_rows        = '15',
+                    bo_mobile_page_rows = '15',
+                    bo_new              = '24',
+                    bo_hot              = '100',
+                    bo_image_width      = '835',
+                    bo_skin             = '$bo_skin',
+                    bo_mobile_skin      = '$bo_skin',
+                    bo_include_head     = '_head.php',
+                    bo_include_tail     = '_tail.php',
+                    bo_content_head     = '',
+                    bo_content_tail     = '',
+                    bo_mobile_content_head     = '',
+                    bo_mobile_content_tail     = '',
+                    bo_insert_content   = '',
+                    bo_gallery_cols     = '4',
+                    bo_gallery_width    = '202',
+                    bo_gallery_height   = '150',
+                    bo_mobile_gallery_width = '125',
+                    bo_mobile_gallery_height= '100',
+                    bo_upload_count     = '2',
+                    bo_upload_size      = '1048576',
+                    bo_reply_order      = '1',
+                    bo_use_search       = '0',
+                    bo_order            = '0'
+                    ";
+    sql_query($sql, true, $dblink);
+
+    // 게시판 테이블 생성
+    $file = file("../".G5_ADMIN_DIR."/sql_write.sql");
+    $file = get_db_create_replace($file);
+    $sql = implode($file, "\n");
+
+    $create_table = $table_prefix.'write_' . $tmp_bo_table[$i];
+
+    // sql_board.sql 파일의 테이블명을 변환
+    $source = array("/__TABLE_NAME__/", "/;/");
+    $target = array($create_table, "");
+    $sql = preg_replace($source, $target, $sql);
+    sql_query($sql, false, $dblink);
+}
 ?>
 
         <li>DB설정 완료</li>
@@ -226,6 +316,7 @@ $dir_arr = array (
     $data_path.'/file',
     $data_path.'/log',
     $data_path.'/member',
+    $data_path.'/member_image',
     $data_path.'/session',
     $data_path.'/content',
     $data_path.'/faq',
@@ -285,6 +376,7 @@ fwrite($f, "\$g5['faq_table'] = G5_TABLE_PREFIX.'faq'; // 자주하시는 질문
 fwrite($f, "\$g5['faq_master_table'] = G5_TABLE_PREFIX.'faq_master'; // 자주하시는 질문 마스터 테이블\n");
 fwrite($f, "\$g5['new_win_table'] = G5_TABLE_PREFIX.'new_win'; // 새창 테이블\n");
 fwrite($f, "\$g5['menu_table'] = G5_TABLE_PREFIX.'menu'; // 메뉴관리 테이블\n");
+fwrite($f, "\$g5['social_profile_table'] = G5_TABLE_PREFIX.'member_social_profiles'; // 소셜 로그인 테이블\n");
 fwrite($f, "?>");
 
 fclose($f);

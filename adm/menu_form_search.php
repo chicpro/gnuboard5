@@ -55,10 +55,10 @@ if($sql) {
                 $link = G5_BBS_URL.'/group.php?gr_id='.$row['id'];
                 break;
             case 'board':
-                $link = G5_BBS_URL.'/board.php?bo_table='.$row['id'];
+                $link = get_pretty_url($row['id']);
                 break;
             case 'content':
-                $link = G5_BBS_URL.'/content.php?co_id='.$row['id'];
+                $link = get_pretty_url(G5_CONTENT_DIR, $row['id']);
                 break;
             default:
                 $link = '';
@@ -77,7 +77,7 @@ if($sql) {
         <td class="td_mngsmall">
             <input type="hidden" name="subject[]" value="<?php echo preg_replace('/[\'\"]/', '', $row['subject']); ?>">
             <input type="hidden" name="link[]" value="<?php echo $link; ?>">
-            <button type="button" class="add_select"><span class="sound_only"><?php echo $row['subject']; ?> </span>선택</button>
+            <button type="button" class="add_select btn btn_03"><span class="sound_only"><?php echo $row['subject']; ?> </span>선택</button>
         </td>
     </tr>
 
@@ -92,7 +92,7 @@ if($sql) {
 </div>
 
 <div class="btn_win02 btn_win">
-    <button type="button" class="btn_cancel" onclick="window.close();">창닫기</button>
+    <button type="button" class="btn_02 btn" onclick="window.close();">창닫기</button>
 </div>
 
 <?php } else { ?>
@@ -120,7 +120,7 @@ if($sql) {
 </div>
 
 <div class="btn_win02 btn_win">
-    <button type="button" id="add_manual" class="btn_submit">추가</button>
-    <button type="button" class="btn_cancel" onclick="window.close();">창닫기</button>
+    <button type="button" id="add_manual" class="btn_submit btn">추가</button>
+    <button type="button" class="btn_02 btn" onclick="window.close();">창닫기</button>
 </div>
 <?php } ?>

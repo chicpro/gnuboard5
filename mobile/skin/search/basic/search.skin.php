@@ -5,11 +5,27 @@ if (!defined("_GNUBOARD_")) exit; // 개별 페이지 접근 불가
 add_stylesheet('<link rel="stylesheet" href="'.$search_skin_url.'/style.css">', 0);
 ?>
 
+<?php
+if ($stx) {
+    if ($board_count) {
+?>
+<section id="sch_res_ov">
+    <h2>전체검색 결과</h2>
+    <ul>
+        <li>게시판<strong><?php echo $board_count ?>개</strong></li>
+        <li>게시물<strong><?php echo number_format($total_count) ?>개</strong></li>
+        <li><?php echo number_format($page) ?>/<?php echo number_format($total_page) ?> 페이지 열람 중</li>
+    </ul>
+</section>
+<?php
+    }
+}
+?>
 <form name="fsearch" onsubmit="return fsearch_submit(this);" method="get">
 <input type="hidden" name="srows" value="<?php echo $srows ?>">
 <fieldset id="sch_res_detail">
     <legend>상세검색</legend>
-    <div>
+    <div class="sch_wr">
         <?php echo $group_select ?>
         <script>document.getElementById("gr_id").value = "<?php echo $gr_id ?>";</script>
 
@@ -21,11 +37,10 @@ add_stylesheet('<link rel="stylesheet" href="'.$search_skin_url.'/style.css">', 
             <option value="mb_id"<?php echo get_selected($_GET['sfl'], "mb_id") ?>>회원아이디</option>
             <option value="wr_name"<?php echo get_selected($_GET['sfl'], "wr_name") ?>>이름</option>
         </select>
-    </div>
-    <div>
+
         <label for="stx" class="sound_only">검색어<strong class="sound_only"> 필수</strong></label>
-        <input type="text" name="stx" value="<?php echo $text_stx ?>" class="frm_input" required class="required" maxlength="20">
-        <input type="submit" class="btn_submit" value="검색">
+        <input type="text" name="stx" id="stx" value="<?php echo $text_stx ?>" class="frm_input" required  maxlength="20">
+        <button type="submit" class="btn_submit" value="검색"><i class="fa fa-search" aria-hidden="true"></i></button>
 
         <script>
         function fsearch_submit(f)
@@ -56,36 +71,16 @@ add_stylesheet('<link rel="stylesheet" href="'.$search_skin_url.'/style.css">', 
         }
         </script>
     </div>
-    <div>
+    <div class="switch_field chk_box">
         <input type="radio" value="or" <?php echo ($sop == "or") ? "checked" : ""; ?> id="sop_or" name="sop">
-        <label for="sop_or">OR</label>
+        <label for="sop_or"><span></span>OR</label>
         <input type="radio" value="and" <?php echo ($sop == "and") ? "checked" : ""; ?> id="sop_and" name="sop">
-        <label for="sop_and">AND</label>
+        <label for="sop_and"><span></span>AND</label>
     </div>
 </fieldset>
 </form>
 
 <div id="sch_result">
-
-    <?php
-    if ($stx) {
-        if ($board_count) {
-    ?>
-    <section id="sch_res_ov">
-        <h2><?php echo $stx ?> 전체검색 결과</h2>
-        <dl>
-            <dt>게시판</dt>
-            <dd><strong class="sch_word"><?php echo $board_count ?>개</strong></dd>
-            <dt>게시물</dt>
-            <dd><strong class="sch_word"><?php echo number_format($total_count) ?>개</strong></dd>
-        </dl>
-        <p><?php echo number_format($page) ?>/<?php echo number_format($total_page) ?> 페이지 열람 중</p>
-    </section>
-    <?php
-        }
-    }
-    ?>
-
     <?php
     if ($stx) {
         if ($board_count) {
@@ -101,19 +96,19 @@ add_stylesheet('<link rel="stylesheet" href="'.$search_skin_url.'/style.css">', 
     <?php } }  ?>
 
     <hr>
-
+    <div class="list_01">
     <?php if ($stx && $board_count) { ?><section class="sch_res_list"><?php }  ?>
     <?php
     $k=0;
     for ($idx=$table_index, $k=0; $idx<count($search_table) && $k<$rows; $idx++) {
      ?>
-        <h2><a href="./board.php?bo_table=<?php echo $search_table[$idx] ?>&amp;<?php echo $search_query ?>"><?php echo $bo_subject[$idx] ?> 게시판 내 결과</a></h2>
+        <h2><a href="<?php echo get_pretty_url($search_table[$idx], '', $search_query); ?>"><?php echo $bo_subject[$idx] ?> 게시판 내 결과</a></h2>
         <ul>
         <?php
         for ($i=0; $i<count($list[$idx]) && $k<$rows; $i++, $k++) {
             if ($list[$idx][$i]['wr_is_comment'])
             {
-                $comment_def = '<span class="cmt_def">댓글</span>';
+                $comment_def = '<span class="cmt_def"><i class="fa fa-commenting-o" aria-hidden="true"></i><span class="sound_only">댓글</span></span> ';
                 $comment_href = '#c_'.$list[$idx][$i]['wr_id'];
             }
             else
@@ -123,20 +118,22 @@ add_stylesheet('<link rel="stylesheet" href="'.$search_skin_url.'/style.css">', 
             }
          ?>
             <li>
-                <a href="<?php echo $list[$idx][$i]['href'] ?><?php echo $comment_href ?>" class="sch_res_title"><?php echo $comment_def ?><?php echo $list[$idx][$i]['subject'] ?></a>
-                <a href="<?php echo $list[$idx][$i]['href'] ?><?php echo $comment_href ?>" target="_blank">새창</a>
+                <div  class="sch_res_title">
+                    <a href="<?php echo $list[$idx][$i]['href'] ?><?php echo $comment_href ?>"><?php echo $comment_def ?><?php echo $list[$idx][$i]['subject'] ?></a>
+                    <!-- <a href="<?php echo $list[$idx][$i]['href'] ?><?php echo $comment_href ?>" target="_blank" class="sch_res_new"><i class="fa fa-share-square-o" aria-hidden="true"></i><span class="sound_only">새창</span></a> -->
+                </div>
                 <p><?php echo $list[$idx][$i]['content'] ?></p>
-                <?php echo $list[$idx][$i]['name'] ?>
-                <span class="sch_datetime"><?php echo $list[$idx][$i]['wr_datetime'] ?></span>
+                <div class="sch_res_info">
+                    <?php echo $list[$idx][$i]['name'] ?>
+                    <span class="sch_datetime"><i class="fa fa-clock-o" aria-hidden="true"></i> <?php echo $list[$idx][$i]['wr_datetime'] ?></span>
+                </div>
             </li>
         <?php }  ?>
         </ul>
-        <div class="sch_more"><a href="./board.php?bo_table=<?php echo $search_table[$idx] ?>&amp;<?php echo $search_query ?>"><strong><?php echo $bo_subject[$idx] ?></strong> 결과 더보기</a></div>
-
-        <hr>
+        <div class="sch_more"><a href="<?php echo get_pretty_url($search_table[$idx], '', $search_query); ?>"><strong><?php echo $bo_subject[$idx] ?></strong> 결과 더보기</a></div>
     <?php }  ?>
+
     <?php if ($stx && $board_count) {  ?></section><?php }  ?>
-
+    </div>
     <?php echo $write_pages ?>
-
 </div>

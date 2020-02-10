@@ -1,5 +1,5 @@
 <?php
-$sub_menu = '900400';
+$sub_menu = '900410';
 include_once('./_common.php');
 
 $page_size = 20;
@@ -10,6 +10,10 @@ auth_check($auth[$sub_menu], "r");
 $g5['title'] = "문자전송 내역 (번호별)";
 
 if ($page < 1) $page = 1;
+
+if( isset($st) && !in_array($st, array('hs_name', 'hs_hp', 'bk_no')) ){
+    $st = '';
+}
 
 if ($st && trim($sv))
     $sql_search = " and $st like '%$sv%' ";
@@ -27,7 +31,7 @@ $vnum = $total_count - (($page-1) * $page_size);
 include_once(G5_ADMIN_PATH.'/admin.head.php');
 ?>
 
-<form name="search_form" method="get" action="<?echo $_SERVER['SCRIPT_NAME']?>" class="local_sch01 local_sch" >
+<form name="search_form" method="get" action="<?php echo $_SERVER['SCRIPT_NAME']; ?>" class="local_sch01 local_sch" >
 <label for="st" class="sound_only">검색대상</label>
 <select name="st" id="st">
     <option value="hs_name"<?php echo get_selected('hs_name', $st); ?>>이름</option>
@@ -90,9 +94,9 @@ include_once(G5_ADMIN_PATH.'/admin.head.php');
         <td class="td_datetime"><?php echo date('Y-m-d H:i', strtotime($write['wr_datetime']))?></td>
         <td class="td_boolean"><?php echo $write['wr_booking']!='0000-00-00 00:00:00'?"<span title='{$write['wr_booking']}'>예약</span>":'';?></td>
         <td class="td_boolean"><?php echo $res['hs_flag']?'성공':'실패'?></td>
-        <td><span title="<?php echo $write['wr_message']?>"><?php echo $write['wr_message']?></span></td>
-        <td class="td_mngsmall">
-            <a href="./history_view.php?page=<?php echo $page; ?>&amp;st=<?php echo $st; ?>&amp;sv=<?php echo $sv; ?>&amp;wr_no=<?php echo $res['wr_no']; ?>">수정</a>
+        <td class="td_left"><span title="<?php echo $write['wr_message']?>"><?php echo $write['wr_message']?></span></td>
+        <td class="td_mng td_mng_s">
+            <a href="./history_view.php?page=<?php echo $page; ?>&amp;st=<?php echo $st; ?>&amp;sv=<?php echo $sv; ?>&amp;wr_no=<?php echo $res['wr_no']; ?>" class="btn btn_03">수정</a>
         </td>
     </tr>
     <?php } ?>

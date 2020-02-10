@@ -1,6 +1,10 @@
 <?php
 include_once('./_common.php');
 
+if(function_exists('social_provider_logout')){
+    social_provider_logout();
+}
+
 // 이호경님 제안 코드
 session_unset(); // 모든 세션변수를 언레지스터 시켜줌
 session_destroy(); // 세션해제함
@@ -25,10 +29,12 @@ if ($url) {
 
     $link = $url;
 } else if ($bo_table) {
-    $link = G5_BBS_URL.'/board.php?bo_table='.$bo_table;
+    $link = get_pretty_url($bo_table);
 } else {
     $link = G5_URL;
 }
+
+run_event('member_logout', $link);
 
 goto_url($link);
 ?>

@@ -1,5 +1,11 @@
 <?php
+$sub_menu = '100000';
 include_once('./_common.php');
+
+@include_once('./safe_check.php');
+if(function_exists('social_log_file_delete')){
+    social_log_file_delete(86400);      //소셜로그인 디버그 파일 24시간 지난것은 삭제
+}
 
 $g5['title'] = '관리자메인';
 include_once ('./admin.head.php');
@@ -206,8 +212,8 @@ $colspan = 5;
 
         <tr>
             <td class="td_category"><a href="<?php echo G5_BBS_URL ?>/new.php?gr_id=<?php echo $row['gr_id'] ?>"><?php echo cut_str($row['gr_subject'],10) ?></a></td>
-            <td class="td_category"><a href="<?php echo G5_BBS_URL ?>/board.php?bo_table=<?php echo $row['bo_table'] ?>"><?php echo cut_str($row['bo_subject'],20) ?></a></td>
-            <td><a href="<?php echo G5_BBS_URL ?>/board.php?bo_table=<?php echo $row['bo_table'] ?>&amp;wr_id=<?php echo $row2['wr_id'] ?><?php echo $comment_link ?>"><?php echo $comment ?><?php echo conv_subject($row2['wr_subject'], 100) ?></a></td>
+            <td class="td_category"><a href="<?php echo get_pretty_url($row['bo_table']) ?>"><?php echo cut_str($row['bo_subject'],20) ?></a></td>
+            <td><a href="<?php echo get_pretty_url($row['bo_table'], $row2['wr_id']); ?><?php echo $comment_link ?>"><?php echo $comment ?><?php echo conv_subject($row2['wr_subject'], 100) ?></a></td>
             <td class="td_mbname"><div><?php echo $name ?></div></td>
             <td class="td_datetime"><?php echo $datetime ?></td>
         </tr>
@@ -277,7 +283,7 @@ $colspan = 7;
             $link1 = $link2 = "";
             if (!preg_match("/^\@/", $row['po_rel_table']) && $row['po_rel_table'])
             {
-                $link1 = '<a href="'.G5_BBS_URL.'/board.php?bo_table='.$row['po_rel_table'].'&amp;wr_id='.$row['po_rel_id'].'" target="_blank">';
+                $link1 = '<a href="'.get_pretty_url($row['po_rel_table'], $row['po_rel_id']).'" target="_blank">';
                 $link2 = '</a>';
             }
         ?>

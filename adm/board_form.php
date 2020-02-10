@@ -76,6 +76,10 @@ if (!isset($board['bo_mobile_subject'])) {
     sql_query(" ALTER TABLE `{$g5['board_table']}` ADD `bo_mobile_subject` VARCHAR(255) NOT NULL DEFAULT '' AFTER `bo_subject` ", false);
 }
 
+if (!isset($board['bo_use_captcha'])) {
+    sql_query(" ALTER TABLE `{$g5['board_table']}` ADD `bo_use_captcha` TINYINT NOT NULL DEFAULT '0' AFTER `bo_use_sns` ");
+}
+
 $required = "";
 $readonly = "";
 if ($w == '') {
@@ -94,8 +98,8 @@ if ($w == '') {
     $board['bo_download_point'] = $config['cf_download_point'];
 
     $board['bo_gallery_cols'] = 4;
-    $board['bo_gallery_width'] = 174;
-    $board['bo_gallery_height'] = 124;
+    $board['bo_gallery_width'] = 202;
+    $board['bo_gallery_height'] = 150;
     $board['bo_mobile_gallery_width'] = 125;
     $board['bo_mobile_gallery_height'] = 100;
     $board['bo_table_width'] = 100;
@@ -150,13 +154,6 @@ $pg_anchor = '<ul class="anchor">
     <li><a href="#anc_bo_extra">여분필드</a></li>
 </ul>';
 
-$frm_submit = '<div class="btn_confirm01 btn_confirm">
-    <input type="submit" value="확인" class="btn_submit" accesskey="s">
-    <a href="./board_list.php?'.$qstr.'">목록</a>'.PHP_EOL;
-if ($w == 'u') $frm_submit .= '<a href="./board_copy.php?bo_table='.$bo_table.'" id="board_copy" target="win_board_copy">게시판복사</a>
-    <a href="'.G5_BBS_URL.'/board.php?bo_table='.$board['bo_table'].'" class="btn_frmline">게시판 바로가기</a>
-    <a href="./board_thumbnail_delete.php?bo_table='.$board['bo_table'].'&amp;'.$qstr.'" onclick="return delete_confirm2(\'게시판 썸네일 파일을 삭제하시겠습니까?\');">게시판 썸네일 삭제</a>'.PHP_EOL;
-$frm_submit .= '</div>';
 ?>
 
 <form name="fboardform" id="fboardform" action="./board_form_update.php" onsubmit="return fboardform_submit(this)" method="post" enctype="multipart/form-data">
@@ -188,8 +185,8 @@ $frm_submit .= '</div>';
                 <?php if ($w == '') { ?>
                     영문자, 숫자, _ 만 가능 (공백없이 20자 이내)
                 <?php } else { ?>
-                    <a href="<?php echo G5_BBS_URL ?>/board.php?bo_table=<?php echo $board['bo_table'] ?>" class="btn_frmline">게시판 바로가기</a>
-                    <a href="./board_list.php" class="btn_frmline">목록으로</a>
+                    <a href="<?php echo get_pretty_url($board['bo_table']) ?>" class="btn_frmline">게시판 바로가기</a>
+                    <a href="./board_list.php?<?php echo $qstr;?>" class="btn_frmline">목록으로</a>
                 <?php } ?>
             </td>
         </tr>
@@ -197,7 +194,7 @@ $frm_submit .= '</div>';
             <th scope="row"><label for="gr_id">그룹<strong class="sound_only">필수</strong></label></th>
             <td colspan="2">
                 <?php echo get_group_select('gr_id', $board['gr_id'], 'required'); ?>
-                <?php if ($w=='u') { ?><a href="javascript:document.location.href='./board_list.php?sfl=a.gr_id&stx='+document.fboardform.gr_id.value;" class="btn_frmline">동일그룹 게시판목록</a><?php } ?></td>
+                <?php if ($w=='u') { ?><a href="javascript:document.location.href='./board_list.php?sfl=a.gr_id&stx='+document.fboardform.gr_id.value;" class="btn_frmline">동일그룹 게시판목록</a><?php } ?>
             </td>
         </tr>
         <tr>
@@ -259,7 +256,7 @@ $frm_submit .= '</div>';
     </div>
 </section>
 
-<?php echo $frm_submit; ?>
+
 
 <section id="anc_bo_auth">
     <h2 class="h2_frm">게시판 권한 설정</h2>
@@ -400,7 +397,7 @@ $frm_submit .= '</div>';
     </div>
 </section>
 
-<?php echo $frm_submit; ?>
+
 
 <section id="anc_bo_function">
     <h2 class="h2_frm">게시판 기능 설정</h2>
@@ -771,12 +768,25 @@ $frm_submit .= '</div>';
                 <label for="chk_all_order">전체적용</label>
             </td>
         </tr>
+        <tr>
+            <th scope="row"><label for="bo_use_captcha">캡챠 사용</label></th>
+            <td>
+                <?php echo help("체크하면 글 작성시 캡챠를 무조건 사용합니다.( 회원 + 비회원 모두 )<br>미 체크하면 비회원에게만 캡챠를 사용합니다.") ?>
+                <input type="checkbox" name="bo_use_captcha" value="1" <?php echo $board['bo_use_captcha']?'checked':''; ?> id="bo_use_captcha">
+                사용
+            </td>
+            <td class="td_grpset">
+                <input type="checkbox" name="chk_grp_use_captcha" value="1" id="chk_grp_use_captcha">
+                <label for="chk_grp_use_captcha">그룹적용</label>
+                <input type="checkbox" name="chk_all_use_captcha" value="1" id="chk_all_use_captcha">
+                <label for="chk_all_use_captcha">전체적용</label>
+            </td>
+        </tr>
         </tbody>
         </table>
     </div>
 </section>
 
-<?php echo $frm_submit; ?>
 
 <section id="anc_bo_design">
     <h2 class="h2_frm">게시판 디자인/양식</h2>
@@ -840,10 +850,26 @@ $frm_submit .= '</div>';
                 <label for="chk_all_include_tail">전체적용</label>
             </td>
         </tr>
+        <tr id="admin_captcha_box" style="display:none;">
+            <th scope="row">자동등록방지</th>
+            <td>
+                <?php
+                echo help("파일 경로를 입력 또는 수정시 캡챠를 반드시 입력해야 합니다.");
+
+                include_once(G5_CAPTCHA_PATH.'/captcha.lib.php');
+                $captcha_html = captcha_html();
+                $captcha_js   = chk_captcha_js();
+                echo $captcha_html;
+                ?>
+                <script>
+                jQuery("#captcha_key").removeAttr("required").removeClass("required");
+                </script>
+            </td>
+        </tr>
         <tr>
             <th scope="row"><label for="bo_content_head">상단 내용</label></th>
             <td>
-                <?php echo editor_html("bo_content_head", get_text($board['bo_content_head'], 0)); ?>
+                <?php echo editor_html("bo_content_head", get_text(html_purifier($board['bo_content_head']), 0)); ?>
             </td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_content_head" value="1" id="chk_grp_content_head">
@@ -855,7 +881,7 @@ $frm_submit .= '</div>';
         <tr>
             <th scope="row"><label for="bo_content_tail">하단 내용</label></th>
             <td>
-                <?php echo editor_html("bo_content_tail", get_text($board['bo_content_tail'], 0)); ?>
+                <?php echo editor_html("bo_content_tail", get_text(html_purifier($board['bo_content_tail']), 0)); ?>
             </td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_content_tail" value="1" id="chk_grp_content_tail">
@@ -867,7 +893,7 @@ $frm_submit .= '</div>';
         <tr>
             <th scope="row"><label for="bo_mobile_content_head">모바일 상단 내용</label></th>
             <td>
-                <?php echo editor_html("bo_mobile_content_head", get_text($board['bo_mobile_content_head'], 0)); ?>
+                <?php echo editor_html("bo_mobile_content_head", get_text(html_purifier($board['bo_mobile_content_head']), 0)); ?>
             </td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_mobile_content_head" value="1" id="chk_grp_mobile_content_head">
@@ -879,7 +905,7 @@ $frm_submit .= '</div>';
         <tr>
             <th scope="row"><label for="bo_mobile_content_tail">모바일 하단 내용</label></th>
             <td>
-                <?php echo editor_html("bo_mobile_content_tail", get_text($board['bo_mobile_content_tail'], 0)); ?>
+                <?php echo editor_html("bo_mobile_content_tail", get_text(html_purifier($board['bo_mobile_content_tail']), 0)); ?>
             </td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_mobile_content_tail" value="1" id="chk_grp_mobile_content_tail">
@@ -892,7 +918,7 @@ $frm_submit .= '</div>';
          <tr>
             <th scope="row"><label for="bo_insert_content">글쓰기 기본 내용</label></th>
             <td>
-                <textarea id="bo_insert_content" name="bo_insert_content" rows="5"><?php echo $board['bo_insert_content'] ?></textarea>
+                <textarea id="bo_insert_content" name="bo_insert_content" rows="5"><?php echo html_purifier($board['bo_insert_content']); ?></textarea>
             </td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_insert_content" value="1" id="chk_grp_insert_content">
@@ -955,7 +981,7 @@ $frm_submit .= '</div>';
             <th scope="row"><label for="bo_gallery_cols">갤러리 이미지 수<strong class="sound_only">필수</strong></label></th>
             <td>
                 <?php echo help('갤러리 형식의 게시판 목록에서 이미지를 한줄에 몇장씩 보여 줄 것인지를 설정하는 값') ?>
-                <input type="text" name="bo_gallery_cols" value="<?php echo $board['bo_gallery_cols'] ?>" id="bo_gallery_cols" required class="required numeric frm_input" size="4">
+                <?php echo get_member_level_select('bo_gallery_cols', 1, 10, $board['bo_gallery_cols']); ?>
             </td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_gallery_cols" value="1" id="chk_grp_gallery_cols">
@@ -1088,25 +1114,23 @@ $frm_submit .= '</div>';
             <td>
                 <?php echo help('리스트에서 기본으로 정렬에 사용할 필드를 선택합니다. "기본"으로 사용하지 않으시는 경우 속도가 느려질 수 있습니다.') ?>
                 <select id="bo_sort_field" name="bo_sort_field">
-                    <option value="" <?php echo get_selected($board['bo_sort_field'], ""); ?>>wr_num, wr_reply : 기본</option>
-                    <option value="wr_datetime asc" <?php echo get_selected($board['bo_sort_field'], "wr_datetime asc"); ?>>wr_datetime asc : 날짜 이전것 부터</option>
-                    <option value="wr_datetime desc" <?php echo get_selected($board['bo_sort_field'], "wr_datetime desc"); ?>>wr_datetime desc : 날짜 최근것 부터</option>
-                    <option value="wr_hit asc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_hit asc, wr_num, wr_reply"); ?>>wr_hit asc : 조회수 낮은것 부터</option>
-                    <option value="wr_hit desc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_hit desc, wr_num, wr_reply"); ?>>wr_hit desc : 조회수 높은것 부터</option>
-                    <option value="wr_last asc" <?php echo get_selected($board['bo_sort_field'], "wr_last asc"); ?>>wr_last asc : 최근글 이전것 부터</option>
-                    <option value="wr_last desc" <?php echo get_selected($board['bo_sort_field'], "wr_last desc"); ?>>wr_last desc : 최근글 최근것 부터</option>
-                    <option value="wr_comment asc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_comment asc, wr_num, wr_reply"); ?>>wr_comment asc : 댓글수 낮은것 부터</option>
-                    <option value="wr_comment desc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_comment desc, wr_num, wr_reply"); ?>>wr_comment desc : 댓글수 높은것 부터</option>
-                    <option value="wr_good asc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_good asc, wr_num, wr_reply"); ?>>wr_good asc : 추천수 낮은것 부터</option>
-                    <option value="wr_good desc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_good desc, wr_num, wr_reply"); ?>>wr_good desc : 추천수 높은것 부터</option>
-                    <option value="wr_nogood asc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_nogood asc, wr_num, wr_reply"); ?>>wr_nogood asc : 비추천수 낮은것 부터</option>
-                    <option value="wr_nogood desc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_nogood desc, wr_num, wr_reply"); ?>>wr_nogood desc : 비추천수 높은것 부터</option>
-                    <option value="wr_subject asc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_subject asc, wr_num, wr_reply"); ?>>wr_subject asc : 제목 오름차순</option>
-                    <option value="wr_subject desc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_subject desc, wr_num, wr_reply"); ?>>wr_subject desc : 제목 내림차순</option>
-                    <option value="wr_name asc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_name asc, wr_num, wr_reply"); ?>>wr_name asc : 글쓴이 오름차순</option>
-                    <option value="wr_name desc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "wr_name desc, wr_num, wr_reply"); ?>>wr_name desc : 글쓴이 내림차순</option>
-                    <option value="ca_name asc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "ca_name asc, wr_num, wr_reply"); ?>>ca_name asc : 분류명 오름차순</option>
-                    <option value="ca_name desc, wr_num, wr_reply" <?php echo get_selected($board['bo_sort_field'], "ca_name desc, wr_num, wr_reply"); ?>>ca_name desc : 분류명 내림차순</option>
+                    <?php foreach( get_board_sort_fields($board) as $v ){
+                        
+                        $option_value = $order_by_str = $v[0];
+                        if( $v[0] === 'wr_num, wr_reply' ){
+                            $selected = (! $board['bo_sort_field']) ? 'selected="selected"' : '';
+                            $option_value = '';
+                        } else {
+                            $selected = ($board['bo_sort_field'] === $v[0]) ? 'selected="selected"' : '';
+                        }
+                        
+                        if( $order_by_str !== 'wr_num, wr_reply' ){
+                            $tmp = explode(',', $v[0]);
+                            $order_by_str = $tmp[0];
+                        }
+
+                        echo '<option value="'.$option_value.'" '.$selected.' >'.$order_by_str.' : '.$v[1].'</option>';
+                    } //end foreach ?>
                 </select>
             </td>
             <td class="td_grpset">
@@ -1118,9 +1142,10 @@ $frm_submit .= '</div>';
         </tbody>
         </table>
     </div>
+    <button type="button" class="get_theme_galc btn btn_02" >테마 이미지설정 가져오기</button>
+
 </section>
 
-<?php echo preg_replace('#</div>$#i', '<button type="button" class="get_theme_galc">테마 이미지설정 가져오기</button></div>', $frm_submit); ?>
 
 <section id="anc_bo_point">
     <h2 class="h2_frm">게시판 포인트 설정</h2>
@@ -1195,8 +1220,6 @@ $frm_submit .= '</div>';
     </div>
 </section>
 
-<?php echo $frm_submit; ?>
-
 <section id="anc_bo_extra">
     <h2 class="h2_frm">게시판 여분필드 설정</h2>
     <?php echo $pg_anchor ?>
@@ -1217,7 +1240,7 @@ $frm_submit .= '</div>';
                 <label for="bo_<?php echo $i ?>_subj">여분필드 <?php echo $i ?> 제목</label>
                 <input type="text" name="bo_<?php echo $i ?>_subj" id="bo_<?php echo $i ?>_subj" value="<?php echo get_text($board['bo_'.$i.'_subj']) ?>" class="frm_input">
                 <label for="bo_<?php echo $i ?>">여분필드 <?php echo $i ?> 값</label>
-                <input type="text" name="bo_<?php echo $i ?>" value="<?php echo get_text($board['bo_'.$i]) ?>" id="bo_<?php echo $i ?>" class="frm_input">
+                <input type="text" name="bo_<?php echo $i ?>" value="<?php echo get_text($board['bo_'.$i]) ?>" id="bo_<?php echo $i ?>" class="frm_input extra-value-input">
             </td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_<?php echo $i ?>" value="1" id="chk_grp_<?php echo $i ?>">
@@ -1232,7 +1255,15 @@ $frm_submit .= '</div>';
     </div>
 </section>
 
-<?php echo $frm_submit; ?>
+
+<div class="btn_fixed_top">
+    <?php if( $bo_table && $w ){ ?>
+        <a href="./board_copy.php?bo_table=<?php echo $board['bo_table']; ?>" id="board_copy" target="win_board_copy" class=" btn_02 btn">게시판복사</a>
+        <a href="<?php echo get_pretty_url($board['bo_table']); ?>" class=" btn_02 btn">게시판 바로가기</a>
+        <a href="./board_thumbnail_delete.php?bo_table=<?php echo $board['bo_table'].'&amp;'.$qstr;?>" onclick="return delete_confirm2('게시판 썸네일 파일을 삭제하시겠습니까?');" class="btn_02 btn">게시판 썸네일 삭제</a>
+    <?php } ?>
+    <input type="submit" value="확인" class="btn_submi btn btn_01" accesskey="s">
+</div>
 
 </form>
 
@@ -1293,8 +1324,67 @@ function set_point(f) {
     }
 }
 
+var captcha_chk = false;
+
+function use_captcha_check(){
+    $.ajax({
+        type: "POST",
+        url: g5_admin_url+"/ajax.use_captcha.php",
+        data: { admin_use_captcha: "1" },
+        cache: false,
+        async: false,
+        dataType: "json",
+        success: function(data) {
+        }
+    });
+}
+
+function frm_check_file(){
+    var bo_include_head = "<?php echo $board['bo_include_head']; ?>";
+    var bo_include_tail = "<?php echo $board['bo_include_tail']; ?>";
+    var head = jQuery.trim(jQuery("#bo_include_head").val());
+    var tail = jQuery.trim(jQuery("#bo_include_tail").val());
+
+    if(bo_include_head !== head || bo_include_tail !== tail){
+        // 캡챠를 사용합니다.
+        jQuery("#admin_captcha_box").show();
+        captcha_chk = true;
+
+        use_captcha_check();
+
+        return false;
+    } else {
+        jQuery("#admin_captcha_box").hide();
+    }
+
+    return true;
+}
+
+jQuery(function($){
+    if( window.self !== window.top ){   // frame 또는 iframe을 사용할 경우 체크
+        $("#bo_include_head, #bo_include_tail").on("change paste keyup", function(e) {
+            frm_check_file();
+        });
+
+        use_captcha_check();
+    }
+});
+
 function fboardform_submit(f)
 {
+    <?php
+    if(!$w){
+    $js_array = get_bo_table_banned_word();
+    echo "var banned_array = ". json_encode($js_array) . ";\n";
+    }
+    ?>
+
+    // 게시판명이 금지된 단어로 되어 있으면
+    if( (typeof banned_array != 'undefined') && jQuery.inArray(f.bo_table.value, banned_array) !== -1 ){
+        alert("입력한 게시판 TABLE명을 사용할수 없습니다. 다른 이름으로 입력해 주세요.");
+        return false;
+    }
+
     <?php echo get_editor_js("bo_content_head"); ?>
     <?php echo get_editor_js("bo_content_tail"); ?>
     <?php echo get_editor_js("bo_mobile_content_head"); ?>
@@ -1310,6 +1400,10 @@ function fboardform_submit(f)
         alert("원글 삭제 불가 댓글수는 1 이상 입력하셔야 합니다.");
         f.bo_count_delete.focus();
         return false;
+    }
+
+    if( captcha_chk ) {
+        <?php echo isset($captcha_js) ? $captcha_js : ''; // 캡챠 사용시 자바스크립트에서 입력된 캡챠를 검사함  ?>
     }
 
     return true;

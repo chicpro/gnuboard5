@@ -35,6 +35,7 @@ if(!sql_query(" select co_skin from {$g5['content_table']} limit 1 ", false)) {
 
 $html_title = "내용";
 $g5['title'] = $html_title.' 관리';
+$readonly = '';
 
 if ($w == "u")
 {
@@ -49,9 +50,11 @@ if ($w == "u")
 else
 {
     $html_title .= ' 입력';
-    $co['co_html'] = 2;
-    $co['co_skin'] = 'basic';
-    $co['co_mobile_skin'] = 'basic';
+    $co = array(
+        'co_html' => 2,
+        'co_skin' => 'basic',
+        'co_mobile_skin' => 'basic'
+        );
 }
 
 include_once (G5_ADMIN_PATH.'/admin.head.php');
@@ -75,7 +78,7 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
         <td>
             <?php echo help('20자 이내의 영문자, 숫자, _ 만 가능합니다.'); ?>
             <input type="text" value="<?php echo $co['co_id']; ?>" name="co_id" id ="co_id" required <?php echo $readonly; ?> class="required <?php echo $readonly; ?> frm_input" size="20" maxlength="20">
-            <?php if ($w == 'u') { ?><a href="<?php echo G5_BBS_URL; ?>/content.php?co_id=<?php echo $co_id; ?>" class="btn_frmline">내용확인</a><?php } ?>
+            <?php if ($w == 'u') { ?><a href="<?php echo get_pretty_url('content', $co_id); ?>" class="btn_frmline">내용확인</a><?php } ?>
         </td>
     </tr>
     <tr>
@@ -84,11 +87,11 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
     </tr>
     <tr>
         <th scope="row">내용</th>
-        <td><?php echo editor_html('co_content', get_text($co['co_content'], 0)); ?></td>
+        <td><?php echo editor_html('co_content', get_text(html_purifier($co['co_content']), 0)); ?></td>
     </tr>
     <tr>
         <th scope="row">모바일 내용</th>
-        <td><?php echo editor_html('co_mobile_content', get_text($co['co_mobile_content'], 0)); ?></td>
+        <td><?php echo editor_html('co_mobile_content', get_text(html_purifier($co['co_mobile_content']), 0)); ?></td>
     </tr>
     <tr>
         <th scope="row"><label for="co_skin">스킨 디렉토리<strong class="sound_only">필수</strong></label></th>
@@ -102,16 +105,18 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
             <?php echo get_mobile_skin_select('content', 'co_mobile_skin', 'co_mobile_skin', $co['co_mobile_skin'], 'required'); ?>
         </td>
     </tr>
+    <!--
     <tr>
         <th scope="row"><label for="co_tag_filter_use">태그 필터링 사용</label></th>
         <td>
             <?php echo help("내용에서 iframe 등의 태그를 사용하려면 사용안함으로 선택해 주십시오."); ?>
             <select name="co_tag_filter_use" id="co_tag_filter_use">
-                <option value="1"<?php echo get_selected(1, $co['co_tag_filter_use']); ?>>사용함</option>
-                <option value="0"<?php echo get_selected(0, $co['co_tag_filter_use']); ?>>사용안함</option>
+                <option value="1"<?php echo get_selected($co['co_tag_filter_use'], 1); ?>>사용함</option>
+                <option value="0"<?php echo get_selected($co['co_tag_filter_use'], 0); ?>>사용안함</option>
             </select>
         </td>
     </tr>
+    -->
     <tr>
         <th scope="row"><label for="co_include_head">상단 파일 경로</label></th>
         <td>
@@ -124,6 +129,22 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
         <td>
             <?php echo help("설정값이 없으면 기본 하단 파일을 사용합니다."); ?>
             <input type="text" name="co_include_tail" value="<?php echo $co['co_include_tail']; ?>" id="co_include_tail" class="frm_input" size="60">
+        </td>
+    </tr>
+    <tr id="admin_captcha_box" style="display:none;">
+        <th scope="row">자동등록방지</th>
+        <td>
+            <?php
+            echo help("파일 경로를 입력 또는 수정시 캡챠를 반드시 입력해야 합니다.");
+
+            include_once(G5_CAPTCHA_PATH.'/captcha.lib.php');
+            $captcha_html = captcha_html();
+            $captcha_js   = chk_captcha_js();
+            echo $captcha_html;
+            ?>
+            <script>
+            jQuery("#captcha_key").removeAttr("required").removeClass("required");
+            </script>
         </td>
     </tr>
     <tr>
@@ -178,14 +199,63 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
     </table>
 </div>
 
-<div class="btn_confirm01 btn_confirm">
-    <input type="submit" value="확인" class="btn_submit" accesskey="s">
-    <a href="./contentlist.php">목록</a>
+<div class="btn_fixed_top">
+    <a href="./contentlist.php" class="btn btn_02">목록</a>
+    <input type="submit" value="확인" class="btn btn_submit" accesskey="s">
 </div>
 
 </form>
 
+<?php
+// [KVE-2018-2089] 취약점 으로 인해 파일 경로 수정시에만 자동등록방지 코드 사용
+?>
 <script>
+var captcha_chk = false;
+
+function use_captcha_check(){
+    $.ajax({
+        type: "POST",
+        url: g5_admin_url+"/ajax.use_captcha.php",
+        data: { admin_use_captcha: "1" },
+        cache: false,
+        async: false,
+        dataType: "json",
+        success: function(data) {
+        }
+    });
+}
+
+function frm_check_file(){
+    var co_include_head = "<?php echo $co['co_include_head']; ?>";
+    var co_include_tail = "<?php echo $co['co_include_tail']; ?>";
+    var head = jQuery.trim(jQuery("#co_include_head").val());
+    var tail = jQuery.trim(jQuery("#co_include_tail").val());
+
+    if(co_include_head !== head || co_include_tail !== tail){
+        // 캡챠를 사용합니다.
+        jQuery("#admin_captcha_box").show();
+        captcha_chk = true;
+
+        use_captcha_check();
+
+        return false;
+    } else {
+        jQuery("#admin_captcha_box").hide();
+    }
+
+    return true;
+}
+
+jQuery(function($){
+    if( window.self !== window.top ){   // frame 또는 iframe을 사용할 경우 체크
+        $("#co_include_head, #co_include_tail").on("change paste keyup", function(e) {
+            frm_check_file();
+        });
+
+        use_captcha_check();
+    }
+});
+
 function frmcontentform_check(f)
 {
     errmsg = "";
@@ -204,6 +274,11 @@ function frmcontentform_check(f)
         errfld.focus();
         return false;
     }
+    
+    if( captcha_chk ) {
+        <?php echo $captcha_js; // 캡챠 사용시 자바스크립트에서 입력된 캡챠를 검사함  ?>
+    }
+
     return true;
 }
 </script>

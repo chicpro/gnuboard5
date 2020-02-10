@@ -344,10 +344,23 @@ var win_memo = function(href) {
 }
 
 /**
+ * 쪽지 창
+ **/
+var check_goto_new = function(href, event) {
+    if( !(typeof g5_is_mobile != "undefined" && g5_is_mobile) ){
+        if (window.opener && window.opener.document && window.opener.document.getElementById) {
+            event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+            window.open(href);
+            //window.opener.document.location.href = href;
+        }
+    }
+}
+
+/**
  * 메일 창
  **/
 var win_email = function(href) {
-    var new_win = window.open(href, 'win_email', 'left=100,top=100,width=600,height=580,scrollbars=0');
+    var new_win = window.open(href, 'win_email', 'left=100,top=100,width=600,height=580,scrollbars=1');
     new_win.focus();
 }
 
@@ -427,8 +440,10 @@ var win_zip = function(frm_name, frm_zip, frm_addr1, frm_addr2, frm_addr3, frm_j
         if(of[frm_jibeon] !== undefined){
             of[frm_jibeon].value = data.userSelectedType;
         }
-
-        of[frm_addr2].focus();
+        
+        setTimeout(function(){
+            of[frm_addr2].focus();
+        } , 100);
     };
 
     switch(zip_case) {
@@ -540,7 +555,7 @@ $(function() {
 /**
  * 텍스트 리사이즈
 **/
-function font_resize(id, rmv_class, add_class)
+function font_resize(id, rmv_class, add_class, othis)
 {
     var $el = $("#"+id);
 
@@ -548,6 +563,10 @@ function font_resize(id, rmv_class, add_class)
 
     set_cookie("ck_font_resize_rmv_class", rmv_class, 1, g5_cookie_domain);
     set_cookie("ck_font_resize_add_class", add_class, 1, g5_cookie_domain);
+
+    if(typeof othis !== "undefined"){
+        $(othis).addClass('select').siblings().removeClass('select');
+    }
 }
 
 /**
