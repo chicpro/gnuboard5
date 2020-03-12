@@ -35,7 +35,63 @@ if ($i == 0) echo '<span class="sound_only">팝업레이어 알림이 없습니�
 </div>
 
 <script>
+function popupLayerResize(device_width) {
+    $(".hd_pops").each(function(i) {
+        var $el = $(this);
+        var elWidth = $el.width();
+
+        var width = elWidth + parseInt($el.css("left"));
+
+        if (width > device_width) {
+            var left;
+
+            if(elWidth > device_width)
+                left = 0;
+            else
+                left = parseInt((width - device_width) / 2);
+
+            if (left < 0)
+                left = 0;
+
+            $el.find("img").each(function(idx) {
+                var $img = $(this);
+
+                if ($img.width() > elWidth) {
+                    $img.css("width", "100%").css("height", "");
+                }
+            });
+
+            if (elWidth > device_width) {
+                $el.css("width", "100%");
+                $el.find(".hd_pops_con").css("width", "100%").css("height", "");
+            }
+
+            $el.css("left", left);
+        }
+    });
+}
+
 $(function() {
+    var device_width = $(window).width();
+
+    $(".hd_pops").each(function(i) {
+        var $el = $(this);
+
+        if($el.data("left") == undefined) {
+            $el.data("left", $el.css("left"));
+
+            $el.find(".hd_pops_con").each(function(k) {
+                var $t = $(this);
+
+                if ($t.css("width") != undefined)
+                    $t.data("width", $t.css("width"));
+
+                if ($t.css("height") != undefined)
+                    $t.data("height", $t.css("height"));
+            });
+        }
+    });
+
     $(".hd_pops_reject").click(function() {
         var id = $(this).attr('class').split(' ');
         var ck_name = id[1];
@@ -47,6 +103,35 @@ $(function() {
         var idb = $(this).attr('class').split(' ');
         $('#'+idb[1]).css('display','none');
     });
+
+    // 레이어 width 기기에 맞게 재조정
+    popupLayerResize(device_width);
+
+    $( window ).resize(function() {
+        $(".hd_pops").each(function(i) {
+            var $el = $(this);
+
+            $el.css("width", "");
+
+            if ($el.data("left") != undefined) {
+                $el.css("left", $el.data("left"));
+
+                $el.find(".hd_pops_con").each(function(j) {
+                    var $t = $(this);
+
+                    if ($t.data("width") != undefined)
+                        $t.css("width", $t.data("width"));
+
+                    if ($t.data("height") != undefined)
+                        $t.css("height", $t.data("height"));
+                });
+            }
+        });
+
+        device_width = $(window).width();
+        popupLayerResize(device_width);
+    });
+
 });
 </script>
 <!-- } 팝업레이어 끝 -->
