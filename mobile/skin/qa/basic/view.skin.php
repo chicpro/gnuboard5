@@ -3,12 +3,12 @@ if (!defined("_GNUBOARD_")) exit; // 개별 페이지 접근 불가
 include_once(G5_LIB_PATH.'/thumbnail.lib.php');
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <script src="<?php echo G5_JS_URL; ?>/viewimageresize.js"></script>
 
-<ul class="btn_top top btn_bo_user"> 
+<ul class="btn_top top btn_bo_user">
 	<li><a href="<?php echo $list_href ?>" class="btn_b03 btn"><i class="fa fa-list" aria-hidden="true"></i><span class="sound_only">목록</span></a></li>
     <?php if ($write_href) { ?>
     <li><a href="<?php echo $write_href ?>" class="btn_b03 btn"><i class="fa fa-pencil" aria-hidden="true"></i><span class="sound_only">글쓰기</a></li>
@@ -32,7 +32,7 @@ $(".btn_more_opt").on("click", function() {
     $(".more_opt").toggle();
 })
 </script>
-    
+
 <!-- 게시물 읽기 시작 { -->
 <article id="bo_v">
     <header>
@@ -112,7 +112,7 @@ $(".btn_more_opt").on("click", function() {
         <!-- } 첨부파일 끝 -->
         <?php } ?>
     </section>
-    
+
     <?php if ($prev_href || $next_href) { ?>
     <ul class="bo_v_nb">
         <?php if ($prev_href) { ?><li class="bo_v_prev"><a href="<?php echo $prev_href ?>"><i class="fa fa-chevron-up" aria-hidden="true"></i><span class="sound_only">이전글</span> <?php echo $prev_wr_subject;?></a></li><?php } ?>
@@ -145,7 +145,7 @@ if(!$view['qa_type']) {
             <li>
                 <div class="li_title">
                     <strong><?php echo get_text($rel_list[$i]['category']); ?></strong>
-                
+
                     <a href="<?php echo $rel_list[$i]['view_href']; ?>" class="li_sbj">
                         <?php echo $rel_list[$i]['subject']; ?>
                     </a>
@@ -162,7 +162,7 @@ if(!$view['qa_type']) {
     </div>
 </section>
 <?php } ?>
-    
+
 <script>
 $(function() {
     $("a.view_image").click(function() {

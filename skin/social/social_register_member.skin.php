@@ -8,7 +8,7 @@ if( ! $config['cf_social_login_use']) {     //소셜 로그인을 사용하지 �
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
 add_stylesheet('<link rel="stylesheet" href="'.G5_JS_URL.'/remodal/remodal.css">', 11);
 add_stylesheet('<link rel="stylesheet" href="'.G5_JS_URL.'/remodal/remodal-default-theme.css">', 12);
-add_stylesheet('<link rel="stylesheet" href="'.get_social_skin_url().'/style.css">', 13);
+add_stylesheet('<link rel="stylesheet" href="'.get_social_skin_url().'/style.css">', 13, G5_CSS_VER);
 add_javascript('<script src="'.G5_JS_URL.'/remodal/remodal.js"></script>', 10);
 
 $email_msg = $is_exists_email ? '등록할 이메일이 중복되었습니다.다른 이메일을 입력해 주세요.' : '';
@@ -18,7 +18,7 @@ $email_msg = $is_exists_email ? '등록할 이메일이 중복되었습니다.�
 <div class="mbskin" id="register_member">
 
     <script src="<?php echo G5_JS_URL ?>/jquery.register_form.js"></script>
-    
+
     <!-- 새로가입 시작 -->
     <form id="fregisterform" name="fregisterform" action="<?php echo $register_action_url; ?>" onsubmit="return fregisterform_submit(this);" method="post" enctype="multipart/form-data" autocomplete="off">
     <input type="hidden" name="w" value="<?php echo $w; ?>">
@@ -170,7 +170,7 @@ $email_msg = $is_exists_email ? '등록할 이메일이 중복되었습니다.�
         jQuery(".toggle .toggle-title .right_i").click(function(){
 
             var $parent = $(this).parent();
-            
+
             if( $parent.hasClass('active') ){
                 $parent.removeClass("active").closest('.toggle').find('.toggle-inner').slideUp(200);
             } else {

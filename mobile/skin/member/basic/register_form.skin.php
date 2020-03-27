@@ -2,7 +2,7 @@
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <div class="register">
@@ -56,7 +56,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 	                    echo '<button type="button" id="win_ipin_cert" class="btn_frmline btn">아이핀 본인확인</button>'.PHP_EOL;
 	                if($config['cf_cert_hp'])
 	                    echo '<button type="button" id="win_hp_cert" class="btn_frmline btn">휴대폰 본인확인</button>'.PHP_EOL;
-	
+
 	                echo '<noscript>본인확인을 위해서는 자바스크립트 사용이 가능해야합니다.</noscript>'.PHP_EOL;
 	            }
 	            ?>
@@ -78,7 +78,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 	        <?php if ($req_nick) { ?>
 	        <li>
 	            <label for="reg_mb_nick" class="sound_only">닉네임<strong>필수</strong></label>
-	            
+
 	            <span class="frm_info">
 	                공백없이 한글,영문,숫자만 입력 가능 (한글2자, 영문4자 이상)<br>
 	                닉네임을 바꾸시면 앞으로 <?php echo (int)$config['cf_nick_modify'] ?>일 이내에는 변경 할 수 없습니다.
@@ -107,26 +107,26 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 	            <input type="text" name="mb_homepage" value="<?php echo get_text($member['mb_homepage']) ?>" id="reg_mb_homepage" class="frm_input full_input <?php echo $config['cf_req_homepage']?"required":""; ?>" maxlength="255" <?php echo $config['cf_req_homepage']?"required":""; ?> placeholder="홈페이지">
 	        </li>
 	        <?php } ?>
-	
+
 	        <?php if ($config['cf_use_tel']) { ?>
 	        <li>
 	            <label for="reg_mb_tel" class="sound_only">전화번호<?php if ($config['cf_req_tel']) { ?><strong>필수</strong><?php } ?></label>
 	            <input type="text" name="mb_tel" value="<?php echo get_text($member['mb_tel']) ?>" id="reg_mb_tel" class="frm_input full_input <?php echo $config['cf_req_tel']?"required":""; ?>" maxlength="20" <?php echo $config['cf_req_tel']?"required":""; ?> placeholder="전화번호">
 	        </li>
 	        <?php } ?>
-	
+
 	        <?php if ($config['cf_use_hp'] || $config['cf_cert_hp']) {  ?>
 	        <li>
 	            <label for="reg_mb_hp" class="sound_only">휴대폰번호<?php if ($config['cf_req_hp']) { ?><strong>필수</strong><?php } ?></label>
-	            
+
 	            <input type="text" name="mb_hp" value="<?php echo get_text($member['mb_hp']) ?>" id="reg_mb_hp" <?php echo ($config['cf_req_hp'])?"required":""; ?> class="frm_input full_input <?php echo ($config['cf_req_hp'])?"required":""; ?>" maxlength="20" placeholder="휴대폰번호">
 	            <?php if ($config['cf_cert_use'] && $config['cf_cert_hp']) { ?>
 	            <input type="hidden" name="old_mb_hp" value="<?php echo get_text($member['mb_hp']) ?>">
 	            <?php } ?>
-	            
+
 	        </li>
 	        <?php } ?>
-	
+
 	        <?php if ($config['cf_use_addr']) { ?>
 	        <li>
 	        	<div class="adress">
@@ -143,13 +143,13 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 	            <label for="reg_mb_addr3" class="sound_only">참고항목</label>
 	            <input type="text" name="mb_addr3" value="<?php echo get_text($member['mb_addr3']) ?>" id="reg_mb_addr3" class="frm_input frm_address" size="50" readonly="readonly" placeholder="참고항목">
 	            <input type="hidden" name="mb_addr_jibeon" value="<?php echo get_text($member['mb_addr_jibeon']); ?>">
-	            
+
 	        </li>
 	        <?php } ?>
         </ul>
     </div>
 
-    <div class="form_01">  
+    <div class="form_01">
         <h2>기타 개인설정</h2>
 		<ul>
 			<?php if ($config['cf_use_signature']) { ?>
@@ -158,7 +158,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 	            <textarea name="mb_signature" id="reg_mb_signature" class="<?php echo $config['cf_req_signature']?"required":""; ?>" <?php echo $config['cf_req_signature']?"required":""; ?> placeholder="서명"><?php echo $member['mb_signature'] ?></textarea>
 	        </li>
 	        <?php } ?>
-	
+
 	        <?php if ($config['cf_use_profile']) { ?>
 	        <li>
 	            <label for="reg_mb_profile" class="sound_only">자기소개</label>
@@ -182,7 +182,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 	            <?php } ?>
 	        </li>
 	        <?php } ?>
-        
+
 	        <?php if ($member['mb_level'] >= $config['cf_icon_level'] && $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['cf_member_img_height']) {  ?>
 	        <li class="reg_mb_img_file filebox">
 	        	<input type="text" class="fileName" readonly="readonly" placeholder="회원이미지">
@@ -215,7 +215,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 	        	<label for="reg_mb_sms">
 	            	<span></span>
 	            	<b class="sound_only">SMS 수신여부</b>
-	            </label>        
+	            </label>
 	            <span class="chk_li">휴대폰 문자메세지를 받겠습니다.</span>
 	        </li>
 	        <?php } ?>
@@ -226,18 +226,18 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 	      		<label for="reg_mb_open">
 	      			<span></span>
 	      			<b class="sound_only">정보공개</b>
-	      		</label>      
+	      		</label>
 	            <span class="chk_li">다른분들이 나의 정보를 볼 수 있도록 합니다.</span>
 	            <span class="frm_info">
 	                정보공개를 바꾸시면 앞으로 <?php echo (int)$config['cf_open_modify'] ?>일 이내에는 변경이 안됩니다.
 	            </span>
-	            <input type="hidden" name="mb_open_default" value="<?php echo $member['mb_open'] ?>"> 
+	            <input type="hidden" name="mb_open_default" value="<?php echo $member['mb_open'] ?>">
 	        </li>
 	        <?php } else { ?>
 	        <li>
 	            <span  class="frm_label">정보공개</span>
 	            <input type="hidden" name="mb_open" value="<?php echo $member['mb_open'] ?>">
-	            
+
 	            <span class="frm_info">
 	                정보공개는 수정후 <?php echo (int)$config['cf_open_modify'] ?>일 이내, <?php echo date("Y년 m월 j일", isset($member['mb_open_date']) ? strtotime("{$member['mb_open_date']} 00:00:00")+$config['cf_open_modify']*86400:G5_SERVER_TIME+$config['cf_open_modify']*86400); ?> 까지는 변경이 안됩니다.<br>
 	                이렇게 하는 이유는 잦은 정보공개 수정으로 인하여 쪽지를 보낸 후 받지 않는 경우를 막기 위해서 입니다.
@@ -251,7 +251,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 	            social_member_provider_manage();
 	        }
 	        ?>
-	
+
 	        <?php if ($w == "" && $config['cf_use_recommend']) { ?>
 	        <li>
 	            <label for="reg_mb_recommend" class="sound_only">추천인아이디</label>

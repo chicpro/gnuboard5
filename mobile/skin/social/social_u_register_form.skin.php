@@ -9,7 +9,7 @@ $socials = social_get_provider_service_name('', 'all');
 
 $session_id = session_id();
 
-add_stylesheet('<link rel="stylesheet" href="'.get_social_skin_url().'/style.css">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.get_social_skin_url().'/style.css">', 10, G5_CSS_VER);
 ?>
 
 <li>
@@ -18,7 +18,7 @@ add_stylesheet('<link rel="stylesheet" href="'.get_social_skin_url().'/style.css
         <div class="sns-wrap">
 
         <?php foreach( $socials as $social=>$provider_name ){
-            
+
             if( !option_array_checked($social, $config['cf_social_servicelist'])) {
                 continue;
             }
@@ -27,7 +27,7 @@ add_stylesheet('<link rel="stylesheet" href="'.get_social_skin_url().'/style.css
             $add_class='';
             $title='';
             if( in_array($social, $my_provides) ){
-                
+
                 $link_href = G5_SOCIAL_LOGIN_URL.'/unlink.php?provider='.$social.'&amp;social_nonce='.$social_nonce;
 
                 $title = $provider_name.' 연결해제하기';
@@ -76,7 +76,7 @@ function social_link_fn(provider){
         $icon.attr({"href":link_href, "title":atitle}).removeClass("sns-icon-not");
 
         //$icon.children("img").attr({"src" : social_url+"/img/32x32/"+provider+".png", "title":atitle, "alt":atitle}).removeClass("link").addClass("unlink");
-        
+
         alert('연결 되었습니다');
 
         return true;
@@ -90,7 +90,7 @@ jQuery(function($){
     var social_img_path = "<?php echo G5_SOCIAL_LOGIN_URL; ?>",
         self_url = "<?php echo $self_url; ?>",
         urlencode = "<?php echo $urlencode; ?>";
-        
+
     $(".sns-wrap").on("click", ".social_link", function(e){
         e.preventDefault();
 
@@ -129,7 +129,7 @@ jQuery(function($){
                     } else {
                         var atitle = provider+" 연결하기",
                             link_href = self_url+"?provider="+provider+"&mylink=1&url="+urlencode;
-                        
+
                         othis.attr({"href":link_href, "title":atitle}).addClass("sns-icon-not");
 
                         //othis.children("img").attr({"src" : social_img_path+"/img/32x32/"+provider+"_off.png", "title":atitle, "alt":atitle}).removeClass("unlink").addClass("link");
@@ -145,11 +145,11 @@ jQuery(function($){
 
             var pop_url = $(this).attr("href");
             var is_popup = "<?php echo G5_SOCIAL_USE_POPUP; ?>";
-            
+
             if( is_popup ){
                 var newWin = window.open(
-                    pop_url, 
-                    "social_sing_on", 
+                    pop_url,
+                    "social_sing_on",
                     "location=0,status=0,scrollbars=1,width=600,height=500"
                 );
 

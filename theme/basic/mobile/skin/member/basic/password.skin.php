@@ -7,7 +7,7 @@ else if ($w == 'd' || $w == 'x') $g5['title'] = $delete_str."글 삭제";
 else $g5['title'] = $g5['title'];
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <div id="pw_confirm" class="mbskin">

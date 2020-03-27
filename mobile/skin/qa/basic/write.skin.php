@@ -2,7 +2,7 @@
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <section id="bo_w">
@@ -25,7 +25,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
     }
 
     echo $option_hidden;
-    ?>           	
+    ?>
     <div class="form_01">
         <ul>
             <?php if ($category_option) { ?>
@@ -53,7 +53,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
                 <input type="email" name="qa_email" value="<?php echo get_text($write['qa_email']); ?>" id="qa_email" <?php echo $req_email; ?> class="<?php echo $req_email.' '; ?>frm_input full_input email" maxlength="100" placeholder="이메일">
                 <div class="chk_op chk_box">
 					<input type="checkbox" name="qa_email_recv" value="1" id="qa_email_recv" <?php if($write['qa_email_recv']) echo 'checked="checked"'; ?> class="selec_chk">
-                	<label for="qa_email_recv"><span></span>답변받기</label>                  
+                	<label for="qa_email_recv"><span></span>답변받기</label>
                 </div>
             </li>
             <?php } ?>
@@ -65,7 +65,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
                 <?php if($qaconfig['qa_use_sms']) { ?>
                 <div class="chk_op chk_box">
                 	<input type="checkbox" name="qa_sms_recv" value="1" id="qa_sms_recv" <?php if($write['qa_sms_recv']) echo 'checked="checked"'; ?> class="selec_chk">
-                	<label for="qa_sms_recv"><span></span>답변등록 SMS알림 수신</label>                  
+                	<label for="qa_sms_recv"><span></span>답변등록 SMS알림 수신</label>
                 </div>
                 <?php } ?>
             </li>

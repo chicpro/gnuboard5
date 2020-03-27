@@ -3,7 +3,7 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 include_once(G5_LIB_PATH.'/thumbnail.lib.php');
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$latest_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$latest_skin_url.'/style.css">', 0, G5_CSS_VER);
 $thumb_width = 210;
 $thumb_height = 150;
 $list_count = (is_array($list) && $list) ? count($list) : 0;
@@ -35,7 +35,7 @@ $list_count = (is_array($list) && $list) ? count($list) : 0;
             else
                 echo $list[$i]['subject'];
             echo "</a>";
-			
+
 			if ($list[$i]['icon_new']) echo "<span class=\"new_icon\">N<span class=\"sound_only\">새글</span></span>";
             if ($list[$i]['icon_hot']) echo "<span class=\"hot_icon\">H<span class=\"sound_only\">인기글</span></span>";
 
@@ -53,7 +53,7 @@ $list_count = (is_array($list) && $list) ? count($list) : 0;
 
             <div class="lt_info">
 				<span class="lt_nick"><?php echo $list[$i]['name'] ?></span>
-            	<span class="lt_date"><?php echo $list[$i]['datetime2'] ?></span>              
+            	<span class="lt_date"><?php echo $list[$i]['datetime2'] ?></span>
             </div>
         </li>
     <?php }  ?>

@@ -7,10 +7,10 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_JS_URL.'/owlcarousel/owl.carou
 
 add_javascript('<script src="'.G5_JS_URL.'/tooltipster/tooltipster.bundle.min.js"></script>', 11);
 add_stylesheet('<link rel="stylesheet" href="'.G5_JS_URL.'/tooltipster/tooltipster.bundle.min.css">', 11);
-add_javascript('<script src="'.$latest_skin_url.'/latest.carousel.js?v2"></script>', 12);
+add_javascript('<script src="'.$latest_skin_url.'/latest.carousel.js"></script>', 12);
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$latest_skin_url.'/style.css?v2">', 1);
+add_stylesheet('<link rel="stylesheet" href="'.$latest_skin_url.'/style.css">', 1, G5_CSS_VER);
 $thumb_width = 138;
 $thumb_height = 80;
 $list_count = (is_array($list) && $list) ? count($list) : 0;
@@ -28,7 +28,7 @@ $is_show_next_prev = ($list_count > 4) ? 1 : 0;
             $thumb = get_list_thumbnail($bo_table, $list[$i]['wr_id'], $thumb_width, $thumb_height, false, true);
             $img = $thumb['src'] ? $thumb['src'] : '';
             $img_content = $img ? '<img src="'.$img.'" alt="'.$thumb['alt'].'" >' : '';
-            
+
             $echo_ul = ( $i && (($i % $divisor_count) === 0) ) ? '</ul><ul class="item">'.PHP_EOL : '';
 
             echo $echo_ul;
@@ -36,11 +36,11 @@ $is_show_next_prev = ($list_count > 4) ? 1 : 0;
             <li>
                 <?php
                 //echo $list[$i]['icon_reply']." ";
-                
+
                 if( $img_content ){
                     echo "<a href=\"".$list[$i]['href']."\" class=\"lt_thumb\">".$img_content."</a> ";
                 }
-                
+
                 echo "<a href=\"".$list[$i]['href']."\" class=\"lt_tit\">";
                 if ($list[$i]['icon_secret']) echo "<i class=\"fa fa-lock\" aria-hidden=\"true\"></i> ";
                 if ($list[$i]['is_notice'])
@@ -55,12 +55,12 @@ $is_show_next_prev = ($list_count > 4) ? 1 : 0;
                 if ($list[$i]['icon_file']) echo " <i class=\"fa fa-download\" aria-hidden=\"true\"></i>" ;
                 if ($list[$i]['icon_link']) echo " <i class=\"fa fa-link\" aria-hidden=\"true\"></i>" ;
                 if ($list[$i]['icon_hot']) echo " <i class=\"fa fa-heart\" aria-hidden=\"true\"></i>";
-                
+
                 if ($list[$i]['comment_cnt'])  echo "
                 <span class=\"lt_cmt\"><span class=\"sound_only\">댓글</span>".$list[$i]['comment_cnt']."</span>";
                 echo "</a>";
                 ?>
-               
+
                 <div class="lt_info">
                     <?php echo $list[$i]['name'] ?>
                     <span class="lt_date">

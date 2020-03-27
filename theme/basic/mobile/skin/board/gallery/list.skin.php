@@ -3,7 +3,7 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 include_once(G5_LIB_PATH.'/thumbnail.lib.php');
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <script src="<?php echo G5_JS_URL; ?>/jquery.fancylist.js"></script>
@@ -25,7 +25,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0
     <?php if ($is_admin == 'super' || $is_auth) {  ?>
 	<li>
 		<button type="button" class="btn_more_opt btn_b03 btn is_list_btn" title="게시판 리스트 옵션"><i class="fa fa-ellipsis-v" aria-hidden="true"></i><span class="sound_only">게시판 리스트 옵션</span></button>
-		<?php if ($is_checkbox) { ?>	
+		<?php if ($is_checkbox) { ?>
         <ul class="more_opt is_list_btn">
             <li><button type="submit" name="btn_submit" value="선택삭제" onclick="document.pressed=this.value"><i class="fa fa-trash-o" aria-hidden="true"></i> 선택삭제</button></li>
             <li><button type="submit" name="btn_submit" value="선택복사" onclick="document.pressed=this.value"><i class="fa fa-files-o" aria-hidden="true"></i> 선택복사</button></li>
@@ -66,7 +66,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0
         <?php for ($i=0; $i<count($list); $i++) { ?>
         <li class="gall_li <?php if ($wr_id == $list[$i]['wr_id']) { ?>gall_now<?php } ?>">
             <div class="gall_li_wr">
-                
+
                 <?php if ($is_checkbox) { ?>
                 <span class="gall_li_chk chk_box">
                     <input type="checkbox" name="chk_wr_id[]" value="<?php echo $list[$i]['wr_id'] ?>" id="chk_wr_id_<?php echo $i ?>" class="selec_chk">
@@ -84,7 +84,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0
                         echo $list[$i]['num'];
                     ?>
                 </span>
-                
+
                 <a href="<?php echo $list[$i]['href'] ?>" class="gall_img">
                 <?php
                 if ($list[$i]['is_notice']) { // 공지사항 ?>
@@ -108,10 +108,10 @@ add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0
                     <a href="<?php echo $list[$i]['ca_name_href'] ?>" class="bo_cate_link"><?php echo $list[$i]['ca_name'] ?></a>
                     <?php } ?>
                     <a href="<?php echo $list[$i]['href'] ?>" class="gall_li_tit">
-                        
+
                         <?php // echo $list[$i]['icon_reply']; ?>
                         <!-- 갤러리 답글기능 사용시 주석을 제거하세요. -->
-                        
+
                         <?php if (isset($list[$i]['icon_secret'])) echo $list[$i]['icon_secret']; ?>
                         <?php echo $list[$i]['subject'] ?>
                         <?php if ($list[$i]['comment_cnt']) { ?>
@@ -122,13 +122,13 @@ add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0
 	                    </span>
 	                    <?php } ?>
 						<?php
-	                    // if ($list[$i]['file']['count']) { echo '<'.$list[$i]['file']['count'].'>'; }	
+	                    // if ($list[$i]['file']['count']) { echo '<'.$list[$i]['file']['count'].'>'; }
 	                    if ($list[$i]['icon_new']) echo "<span class=\"new_icon\">N<span class=\"sound_only\">새글</span></span>";
 	                    if (isset($list[$i]['icon_hot'])) echo $list[$i]['icon_hot'];
 	                    //if (isset($list[$i]['icon_file'])) echo $list[$i]['icon_file'];
 	                    //if (isset($list[$i]['icon_link'])) echo $list[$i]['icon_link'];
 	                    ?>
-					</a>                  
+					</a>
                     <div class="gall_info">
                     	<span class="sound_only">작성자 </span><?php echo $list[$i]['name'] ?>
                         <span class="sound_only">작성일 </span><span class="date"><i class="fa fa-clock-o" aria-hidden="true"></i> <?php echo $list[$i]['datetime2'] ?></span>

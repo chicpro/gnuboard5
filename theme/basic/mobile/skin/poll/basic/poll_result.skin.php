@@ -10,7 +10,7 @@ if ((int) $total_po_cnt > 0){
 }
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$poll_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$poll_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <!-- 설문조사 결과 시작 { -->
@@ -28,7 +28,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$poll_skin_url.'/style.css">', 0)
                     $poll_1st_class = ($get_max_cnt && ((int) $list[$i]['cnt'] === (int) $get_max_cnt)) ? 'poll_1st' : '';
                 ?>
                 <li class="<?php echo $poll_1st_class; ?>">
-                    <span><?php echo $list[$i]['content'] ?></span>   
+                    <span><?php echo $list[$i]['content'] ?></span>
                     <div class="poll_result_graph">
                         <span style="width:<?php echo number_format($list[$i]['rate'], 1) ?>%"></span>
                     </div>
@@ -57,7 +57,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$poll_skin_url.'/style.css">', 0)
                 </header>
                 <p>
                     <?php echo $list2[$i]['idea'] ?>
-                </p>  
+                </p>
             </article>
             <?php } ?>
 
@@ -81,14 +81,14 @@ add_stylesheet('<link rel="stylesheet" href="'.$poll_skin_url.'/style.css">', 0)
             </div>
         	<?php }  ?>
             <?php echo captcha_html(); ?>
-			<button type="submit" class="btn_submit">의견남기기</button>           
+			<button type="submit" class="btn_submit">의견남기기</button>
             </form>
             <?php }  ?>
 
         </section>
         <?php } ?>
         <!-- } 설문조사 기타의견 끝 -->
-		
+
 		<!-- 설문조사 다른 결과 보기 시작 { -->
         <aside id="poll_result_oth">
             <h2>다른 투표 결과 보기</h2>
@@ -99,7 +99,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$poll_skin_url.'/style.css">', 0)
             </ul>
         </aside>
 		<!-- } 설문조사 다른 결과 보기 끝 -->
-		
+
         <div class="win_btn">
             <button type="button" onclick="window.close();" class="btn_close">창닫기</button>
         </div>

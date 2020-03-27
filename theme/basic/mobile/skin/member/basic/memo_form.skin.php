@@ -2,7 +2,7 @@
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <!-- 쪽지 보내기 시작 { -->
@@ -21,7 +21,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
             <ul>
                 <li>
                     <label for="me_recv_mb_id" class="sound_only">받는 회원아이디<strong>필수</strong></label>
-                    
+
                     <input type="text" name="me_recv_mb_id" value="<?php echo $me_recv_mb_id; ?>" id="me_recv_mb_id" required class="frm_input full_input required" size="47" placeholder="받는 회원아이디">
                     <span class="frm_info">여러 회원에게 보낼때는 컴마(,)로 구분하세요.
                     	<?php if ($config['cf_memo_send_point']) { ?><br>쪽지 보낼때 회원당 <?php echo number_format($config['cf_memo_send_point']); ?>점의 포인트를 차감합니다.<?php } ?>
@@ -33,9 +33,9 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
                 </li>
                 <li>
                     <span class="sound_only">자동등록방지</span>
-                    
+
                     <?php echo captcha_html(); ?>
-                    
+
                 </li>
             </ul>
         </div>

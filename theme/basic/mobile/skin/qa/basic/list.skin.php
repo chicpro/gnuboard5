@@ -2,7 +2,7 @@
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <?php if ($admin_href || $write_href) { ?>
@@ -11,7 +11,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
 	<?php if ($is_admin == 'super' || $is_auth) {  ?>
 	<li>
 		<button type="button" class="btn_more_opt btn_b03 btn"><i class="fa fa-ellipsis-v" aria-hidden="true"></i><span class="sound_only">게시판 리스트 옵션</span></button>
-		<?php if ($is_checkbox) { ?>	
+		<?php if ($is_checkbox) { ?>
         <ul class="more_opt">
             <li><button type="submit" name="btn_submit" value="선택삭제" onclick="document.pressed=this.value"><i class="fa fa-trash-o" aria-hidden="true"></i> 선택삭제</button></li>
         </ul>
@@ -73,7 +73,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$qa_skin_url.'/style.css">', 0);
                 <?php } ?>
                 <div class="bo_cnt">
                 	<div>
-                		<strong class="bo_cate_link"><?php echo $list[$i]['category']; ?></strong>	
+                		<strong class="bo_cate_link"><?php echo $list[$i]['category']; ?></strong>
                 	</div>
                     <a href="<?php echo $list[$i]['view_href']; ?>" class="bo_subject">
                         <?php echo $list[$i]['subject']; ?>

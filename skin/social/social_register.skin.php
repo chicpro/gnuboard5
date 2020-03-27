@@ -15,7 +15,7 @@ if( G5_SOCIAL_USE_POPUP ) {
 }
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.get_social_skin_url().'/style.css">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.get_social_skin_url().'/style.css">', 10, G5_CSS_VER);
 ?>
 <div>
 
@@ -69,8 +69,8 @@ add_stylesheet('<link rel="stylesheet" href="'.get_social_skin_url().'/style.css
 
                         var pop_url = $(this).attr("href");
                         var newWin = window.open(
-                            pop_url, 
-                            "social_sing_on", 
+                            pop_url,
+                            "social_sing_on",
                             "location=0,status=0,scrollbars=1,width=600,height=500"
                         );
 

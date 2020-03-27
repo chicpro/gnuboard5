@@ -2,7 +2,7 @@
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$connect_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$connect_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <div id="current_connect">
@@ -20,7 +20,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$connect_skin_url.'/style.css">',
             <span class="crt_profile"><?php echo get_member_profile_img($list[$i]['mb_id']); ?></span>
             <div class="crt_info">
             	<span class="crt_name"><?php echo $list[$i]['name'] ?></span>
-            	<span class="crt_lct"><?php echo $display_location ?></span>  
+            	<span class="crt_lct"><?php echo $display_location ?></span>
             </div>
         </li>
     <?php

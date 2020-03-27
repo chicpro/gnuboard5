@@ -2,7 +2,7 @@
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 0, G5_CSS_VER);
 ?>
 
 <div class="mbskin">
@@ -13,14 +13,14 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
     ?>
 
     <form name="fregister" id="fregister" action="<?php echo $register_action_url ?>" onsubmit="return fregister_submit(this);" method="POST" autocomplete="off">
-	
+
 	<p>회원가입약관 및 개인정보처리방침안내의 내용에 동의하셔야 회원가입 하실 수 있습니다.</p>
-	
+
 	<div id="fregister_chkall" class="chk_all fregister_agree">
         <input type="checkbox" name="chk_all" id="chk_all" class="selec_chk">
         <label for="chk_all"><span></span>회원가입 약관에 모두 동의합니다</label>
     </div>
-    
+
     <section id="fregister_term">
         <h2>회원가입약관</h2>
         <textarea readonly><?php echo get_text($config['cf_stipulation']) ?></textarea>
@@ -67,7 +67,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
             <label for="agree21"><span></span><b class="sound_only">개인정보처리방침안내의 내용에 동의합니다.</b></label>
        </fieldset>
     </section>
-    
+
     <div class="btn_confirm">
         <button type="submit" class="btn_submit">회원가입</button>
     </div>
