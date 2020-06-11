@@ -746,6 +746,10 @@ function get_next_num($table)
 function get_group($gr_id, $is_cache=false)
 {
     global $g5;
+    
+    if( is_array($gr_id) ){
+        return array();
+    }
 
     static $cache = array();
 
@@ -3068,6 +3072,22 @@ function clean_xss_attributes($str)
     return $str;
 }
 
+function clean_relative_paths($path){
+    $path_len = strlen($path);
+    
+    $i = 0;
+    while($i <= $path_len){
+        $result = str_replace('../', '', str_replace('\\', '/', $path));
+
+        if((string)$result === (string)$path) break;
+
+        $path = $result;
+        $i++;
+    }
+
+    return $path;
+}
+
 // unescape nl 얻기
 function conv_unescape_nl($str)
 {
@@ -3097,7 +3117,8 @@ function member_delete($mb_id)
     }
 
     // 회원자료는 정보만 없앤 후 아이디는 보관하여 다른 사람이 사용하지 못하도록 함 : 061025
-    $sql = " update {$g5['member_table']} set mb_password = '', mb_level = 1, mb_email = '', mb_homepage = '', mb_tel = '', mb_hp = '', mb_zip1 = '', mb_zip2 = '', mb_addr1 = '', mb_addr2 = '', mb_birth = '', mb_sex = '', mb_signature = '', mb_memo = '".date('Ymd', G5_SERVER_TIME)." 삭제함\n{$mb['mb_memo']}' where mb_id = '{$mb_id}' ";
+    $sql = " update {$g5['member_table']} set mb_password = '', mb_level = 1, mb_email = '', mb_homepage = '', mb_tel = '', mb_hp = '', mb_zip1 = '', mb_zip2 = '', mb_addr1 = '', mb_addr2 = '', mb_birth = '', mb_sex = '', mb_signature = '', mb_memo = '".date('Ymd', G5_SERVER_TIME)." 삭제함\n".sql_real_escape_string($mb['mb_memo'])."' where mb_id = '{$mb_id}' ";
+
     sql_query($sql);
 
     // 포인트 테이블에서 삭제
@@ -3621,6 +3642,36 @@ function get_head_title($title){
     return $title;
 }
 
+function is_sms_send($is_type=''){
+    global $config;
+    
+    $is_sms_send = false;
+    
+    // 토큰키를 사용한다면
+    if(isset($config['cf_icode_token_key']) && $config['cf_icode_token_key']){
+        $is_sms_send = true;
+    } else if($config['cf_icode_id'] && $config['cf_icode_pw']) {
+        // 충전식일 경우 잔액이 있는지 체크
+
+        $userinfo = get_icode_userinfo($config['cf_icode_id'], $config['cf_icode_pw']);
+
+        if($userinfo['code'] == 0) {
+            if($userinfo['payment'] == 'C') { // 정액제
+                $is_sms_send = true;
+            } else {
+                $minimum_coin = 100;
+                if(defined('G5_ICODE_COIN'))
+                    $minimum_coin = intval(G5_ICODE_COIN);
+
+                if((int)$userinfo['coin'] >= $minimum_coin)
+                    $is_sms_send = true;
+            }
+        }
+    }
+
+    return $is_sms_send;
+}
+
 function is_use_email_certify(){
     global $config;
 
@@ -3714,12 +3765,12 @@ function is_include_path_check($path='', $is_input='')
 
             try {
                 // whether $path is unix or not
-                $unipath = strlen($path)==0 || $path{0}!='/';
+                $unipath = strlen($path)==0 || substr($path, 0, 1) != '/';
                 $unc = substr($path,0,2)=='\\\\'?true:false;
                 // attempts to detect if path is relative in which case, add cwd
                 if(strpos($path,':') === false && $unipath && !$unc){
                     $path=getcwd().DIRECTORY_SEPARATOR.$path;
-                    if($path{0}=='/'){
+                    if(substr($path, 0, 1) == '/'){
                         $unipath = false;
                     }
                 }

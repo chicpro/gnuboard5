@@ -15,6 +15,10 @@ if (file_exists($dbconfig_file)) {
     die(install_json_msg('프로그램이 이미 설치되어 있습니다.'));
 }
 
+if (preg_match("/[^0-9a-z_]+/i", $_POST['table_prefix']) ) {
+    die(install_json_msg('TABLE명 접두사는 영문자, 숫자, _ 만 입력하세요.'));
+}
+
 $mysql_host  = safe_install_string_check($_POST['mysql_host'], 'json');
 $mysql_user  = safe_install_string_check($_POST['mysql_user'], 'json');
 $mysql_pass  = safe_install_string_check($_POST['mysql_pass'], 'json');
@@ -22,7 +26,7 @@ $mysql_db    = safe_install_string_check($_POST['mysql_db'], 'json');
 $table_prefix= safe_install_string_check(preg_replace('/[^a-zA-Z0-9_]/', '_', $_POST['table_prefix']));
 
 $tmp_str = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
-$ajax_token = md5($tmp_str.$_SERVER['REMOTE_ADDR'].$_SERVER['DOCUMENT_ROOT']);
+$ajax_token = md5($tmp_str.$_SERVER['REMOTE_ADDR'].dirname(dirname(__FILE__).'/'));
 
 $bool_ajax_token = ($ajax_token == $_POST['ajax_token']) ? true : false;
 
