@@ -611,7 +611,7 @@ function html_purifier($html)
     //유튜브, 비메오 전체화면 가능하게 하기
     $config->set('Filter.Custom', array(new HTMLPurifier_Filter_Iframevideo()));
     $purifier = new HTMLPurifier($config);
-    return $purifier->purify($html);
+    return run_replace('html_purifier_result', $purifier->purify($html), $purifier, $html);
 }
 
 
@@ -746,7 +746,7 @@ function get_next_num($table)
 function get_group($gr_id, $is_cache=false)
 {
     global $g5;
-    
+
     if( is_array($gr_id) ){
         return array();
     }
@@ -773,7 +773,8 @@ function get_member($mb_id, $fields='*', $is_cache=false)
 {
     global $g5;
 
-    $mb_id = preg_replace("/[^0-9a-z_]+/i", "", $mb_id);
+    if (preg_match("/[^0-9a-z_]+/i", $mb_id))
+        return array();
 
     static $cache = array();
 
@@ -2318,6 +2319,8 @@ function delete_editor_thumbnail($contents)
     if(!$contents)
         return;
 
+    run_event('delete_editor_thumbnail_before', $contents);
+
     // $contents 중 img 태그 추출
     $matchs = get_editor_image($contents);
 
@@ -2337,6 +2340,8 @@ function delete_editor_thumbnail($contents)
                 unlink($filename);
         }
     }
+
+    run_event('delete_editor_thumbnail_after', $contents, $matchs);
 }
 
 // 1:1문의 첨부파일 썸네일 삭제
@@ -3028,7 +3033,7 @@ function clean_xss_tags($str, $check_entities=0)
         if( $check_entities ){
             $result = str_replace(array('&colon;', '&lpar;', '&rpar;', '&NewLine;', '&Tab;'), '', $result);
         }
-        
+
         $result = preg_replace('#([^\p{L}]|^)(?:javascript|jar|applescript|vbscript|vbs|wscript|jscript|behavior|mocha|livescript|view-source)\s*:(?:.*?([/\\\;()\'">]|$))#ius',
                 '$1$2', $result);
 
@@ -3045,7 +3050,7 @@ function clean_xss_tags($str, $check_entities=0)
 function clean_xss_attributes($str)
 {
     $xss_attributes_string = 'onAbort|onActivate|onAttribute|onAfterPrint|onAfterScriptExecute|onAfterUpdate|onAnimationCancel|onAnimationEnd|onAnimationIteration|onAnimationStart|onAriaRequest|onAutoComplete|onAutoCompleteError|onAuxClick|onBeforeActivate|onBeforeCopy|onBeforeCut|onBeforeDeactivate|onBeforeEditFocus|onBeforePaste|onBeforePrint|onBeforeScriptExecute|onBeforeUnload|onBeforeUpdate|onBegin|onBlur|onBounce|onCancel|onCanPlay|onCanPlayThrough|onCellChange|onChange|onClick|onClose|onCommand|onCompassNeedsCalibration|onContextMenu|onControlSelect|onCopy|onCueChange|onCut|onDataAvailable|onDataSetChanged|onDataSetComplete|onDblClick|onDeactivate|onDeviceLight|onDeviceMotion|onDeviceOrientation|onDeviceProximity|onDrag|onDragDrop|onDragEnd|onDragEnter|onDragLeave|onDragOver|onDragStart|onDrop|onDurationChange|onEmptied|onEnd|onEnded|onError|onErrorUpdate|onExit|onFilterChange|onFinish|onFocus|onFocusIn|onFocusOut|onFormChange|onFormInput|onFullScreenChange|onFullScreenError|onGotPointerCapture|onHashChange|onHelp|onInput|onInvalid|onKeyDown|onKeyPress|onKeyUp|onLanguageChange|onLayoutComplete|onLoad|onLoadedData|onLoadedMetaData|onLoadStart|onLoseCapture|onLostPointerCapture|onMediaComplete|onMediaError|onMessage|onMouseDown|onMouseEnter|onMouseLeave|onMouseMove|onMouseOut|onMouseOver|onMouseUp|onMouseWheel|onMove|onMoveEnd|onMoveStart|onMozFullScreenChange|onMozFullScreenError|onMozPointerLockChange|onMozPointerLockError|onMsContentZoom|onMsFullScreenChange|onMsFullScreenError|onMsGestureChange|onMsGestureDoubleTap|onMsGestureEnd|onMsGestureHold|onMsGestureStart|onMsGestureTap|onMsGotPointerCapture|onMsInertiaStart|onMsLostPointerCapture|onMsManipulationStateChanged|onMsPointerCancel|onMsPointerDown|onMsPointerEnter|onMsPointerLeave|onMsPointerMove|onMsPointerOut|onMsPointerOver|onMsPointerUp|onMsSiteModeJumpListItemRemoved|onMsThumbnailClick|onOffline|onOnline|onOutOfSync|onPage|onPageHide|onPageShow|onPaste|onPause|onPlay|onPlaying|onPointerCancel|onPointerDown|onPointerEnter|onPointerLeave|onPointerLockChange|onPointerLockError|onPointerMove|onPointerOut|onPointerOver|onPointerUp|onPopState|onProgress|onPropertyChange|onqt_error|onRateChange|onReadyStateChange|onReceived|onRepeat|onReset|onResize|onResizeEnd|onResizeStart|onResume|onReverse|onRowDelete|onRowEnter|onRowExit|onRowInserted|onRowsDelete|onRowsEnter|onRowsExit|onRowsInserted|onScroll|onSearch|onSeek|onSeeked|onSeeking|onSelect|onSelectionChange|onSelectStart|onStalled|onStorage|onStorageCommit|onStart|onStop|onShow|onSyncRestored|onSubmit|onSuspend|onSynchRestored|onTimeError|onTimeUpdate|onTimer|onTrackChange|onTransitionEnd|onToggle|onTouchCancel|onTouchEnd|onTouchLeave|onTouchMove|onTouchStart|onTransitionCancel|onTransitionEnd|onUnload|onURLFlip|onUserProximity|onVolumeChange|onWaiting|onWebKitAnimationEnd|onWebKitAnimationIteration|onWebKitAnimationStart|onWebKitFullScreenChange|onWebKitFullScreenError|onWebKitTransitionEnd|onWheel';
-    
+
     do {
         $count = $temp_count = 0;
 
@@ -3074,7 +3079,7 @@ function clean_xss_attributes($str)
 
 function clean_relative_paths($path){
     $path_len = strlen($path);
-    
+
     $i = 0;
     while($i <= $path_len){
         $result = str_replace('../', '', str_replace('\\', '/', $path));
@@ -3646,9 +3651,9 @@ function get_head_title($title){
 
 function is_sms_send($is_type=''){
     global $config;
-    
+
     $is_sms_send = false;
-    
+
     // 토큰키를 사용한다면
     if(isset($config['cf_icode_token_key']) && $config['cf_icode_token_key']){
         $is_sms_send = true;
