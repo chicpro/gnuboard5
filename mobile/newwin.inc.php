@@ -38,20 +38,23 @@ if ($i == 0) echo '<span class="sound_only">팝업레이어 알림이 없습니�
 function popupLayerResize(device_width) {
     $(".hd_pops").each(function(i) {
         var $el = $(this);
-        var elWidth = $el.width();
+        var elWidth = $el.outerWidth(true);
 
         var width = elWidth + parseInt($el.css("left"));
 
         if (width > device_width) {
             var left;
 
-            if(elWidth > device_width)
+            if(width > device_width)
                 left = 0;
             else
                 left = parseInt((width - device_width) / 2);
 
             if (left < 0)
                 left = 0;
+
+            if (left == 0 && elWidth < device_width)
+                left = parseInt((device_width - elWidth) / 2);
 
             $el.find("img").each(function(idx) {
                 var $img = $(this);
@@ -62,7 +65,8 @@ function popupLayerResize(device_width) {
             });
 
             if (elWidth > device_width) {
-                $el.css("width", "100%");
+                //$el.css("width", "100%");
+                $el.outerWidth(device_width, true);
                 $el.find(".hd_pops_con").css("width", "100%").css("height", "");
             }
 
