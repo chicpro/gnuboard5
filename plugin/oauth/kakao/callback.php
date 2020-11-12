@@ -16,9 +16,9 @@ if($oauth->check_valid_state_token($_GET['state'])) {
 
         if($oauth->profile->id) {
             $email = '';
-            if($oauth->profile->kaccount_email && $oauth->profile->kaccount_email_verified)
-                $email = $oauth->profile->kaccount_email;
-            
+            if($oauth->profile->kakao_account->email && $oauth->profile->kakao_account->is_email_verified)
+                $email = $oauth->profile->kakao_account->email;
+
             $info  = get_oauth_member_info($oauth->profile->id, $oauth->profile->properties->nickname, 'kakao');
 
             if($info['id']) {
