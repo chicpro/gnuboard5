@@ -20,7 +20,7 @@ class KAKAO_OAUTH {
         $this->ss_name       = 'ss_kko_state_token';
         $this->authorize_url = 'https://kauth.kakao.com/oauth/authorize';
         $this->token_url     = 'https://kauth.kakao.com/oauth/token';
-        $this->profile_url   = 'https://kapi.kakao.com/v1/user/me';
+        $this->profile_url   = 'https://kapi.kakao.com/v2/user/me';
     }
 
     function set_state_token()
