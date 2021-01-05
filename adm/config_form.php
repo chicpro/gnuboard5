@@ -2,7 +2,7 @@
 $sub_menu = "100100";
 include_once('./_common.php');
 
-auth_check($auth[$sub_menu], 'r');
+auth_check_menu($auth, $sub_menu, 'r');
 
 if ($is_admin != 'super')
     alert('최고관리자만 접근 가능합니다.');
@@ -304,6 +304,7 @@ $pg_anchor = '<ul class="anchor">
 if (!$config['cf_icode_server_ip'])   $config['cf_icode_server_ip'] = '211.172.232.124';
 if (!$config['cf_icode_server_port']) $config['cf_icode_server_port'] = '7295';
 
+$userinfo = array('payment'=>'');
 if ($config['cf_sms_use'] && $config['cf_icode_id'] && $config['cf_icode_pw']) {
     $userinfo = get_icode_userinfo($config['cf_icode_id'], $config['cf_icode_pw']);
 }
@@ -569,14 +570,14 @@ if ($config['cf_sms_use'] && $config['cf_icode_id'] && $config['cf_icode_pw']) {
             <td colspan="3">
                 <?php if (!function_exists('curl_init')) echo help('<b>경고) curl이 지원되지 않아 네이버 신디케이션을 사용할수 없습니다.</b>'); ?>
                 <?php echo help('네이버 신디케이션 연동키(token)을 입력하면 네이버 신디케이션을 사용할 수 있습니다.<br>연동키는 <a href="http://webmastertool.naver.com/" target="_blank"><u>네이버 웹마스터도구</u></a> -> 네이버 신디케이션에서 발급할 수 있습니다.') ?>
-                <input type="text" name="cf_syndi_token" value="<?php echo $config['cf_syndi_token'] ?>" id="cf_syndi_token" class="frm_input" size="70">
+                <input type="text" name="cf_syndi_token" value="<?php echo get_sanitize_input($config['cf_syndi_token']); ?>" id="cf_syndi_token" class="frm_input" size="70">
             </td>
         </tr>
         <tr>
             <th scope="row"><label for="cf_syndi_except">네이버 신디케이션 제외게시판</label></th>
             <td colspan="3">
                 <?php echo help('네이버 신디케이션 수집에서 제외할 게시판 아이디를 | 로 구분하여 입력하십시오. 예) notice|adult<br>참고로 그룹접근사용 게시판, 글읽기 권한 2 이상 게시판, 비밀글은 신디케이션 수집에서 제외됩니다.') ?>
-                <input type="text" name="cf_syndi_except" value="<?php echo $config['cf_syndi_except'] ?>" id="cf_syndi_except" class="frm_input" size="70">
+                <input type="text" name="cf_syndi_except" value="<?php echo get_sanitize_input($config['cf_syndi_except']); ?>" id="cf_syndi_except" class="frm_input" size="70">
             </td>
         </tr>
         </tbody>
@@ -1129,7 +1130,7 @@ include_once('_rewrite_config_form.php');
                     <label for="check_social_payco">페이코 로그인을 사용합니다</label>
                     <div>
                     <h3>페이코 CallbackURL</h3>
-                    <p><?php echo get_social_callbackurl('payco'); ?></p>
+                    <p><?php echo get_social_callbackurl('payco', false, true); ?></p>
                     </div>
                 </div>
             </td>
@@ -1157,7 +1158,7 @@ include_once('_rewrite_config_form.php');
         <tr>
             <th scope="row"><label for="cf_twitter_key">트위터 컨슈머 Key</label></th>
             <td>
-                <input type="text" name="cf_twitter_key" value="<?php echo $config['cf_twitter_key'] ?>" id="cf_twitter_key" class="frm_input" size="40"> <a href="https://dev.twitter.com/apps" target="_blank" class="btn_frmline">앱 등록하기</a>
+                <input type="text" name="cf_twitter_key" value="<?php echo $config['cf_twitter_key'] ?>" id="cf_twitter_key" class="frm_input" size="40"> <a href="https://developer.twitter.com/en/apps" target="_blank" class="btn_frmline">앱 등록하기</a>
             </td>
             <th scope="row"><label for="cf_twitter_secret">트위터 컨슈머 Secret</label></th>
             <td>
@@ -1434,6 +1435,26 @@ $(function(){
 
 function fconfigform_submit(f)
 {
+    var current_user_ip = "<?php echo $_SERVER['REMOTE_ADDR']; ?>";
+    var cf_intercept_ip_val = f.cf_intercept_ip.value;
+
+    if( cf_intercept_ip_val && current_user_ip ){
+        var cf_intercept_ips = cf_intercept_ip_val.split("\n");
+
+        for(var i=0; i < cf_intercept_ips.length; i++){
+            if ( cf_intercept_ips[i].trim() ) {
+                cf_intercept_ips[i] = cf_intercept_ips[i].replace(".", "\.");
+                cf_intercept_ips[i] = cf_intercept_ips[i].replace("+", "[0-9\.]+");
+                
+                var re = new RegExp(cf_intercept_ips[i]);
+                if ( re.test(current_user_ip) ){
+                    alert("현재 접속 IP : "+ current_user_ip +" 가 차단될수 있기 때문에, 다른 IP를 입력해 주세요.");
+                    return false;
+                }
+            }
+        }
+    }
+
     f.action = "./config_form_update.php";
     return true;
 }
@@ -1510,4 +1531,3 @@ if($config['cf_cert_use']) {
 }
 
 include_once ('./admin.tail.php');
-?>
