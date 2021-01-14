@@ -3,7 +3,7 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 include_once(G5_LIB_PATH.'/thumbnail.lib.php');
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$latest_skin_url.'/style.css">', 0, G5_CSS_VER);
+add_stylesheet('<link rel="stylesheet" href="'.$latest_skin_url.'/style.css">', 0);
 $thumb_width = 297;
 $thumb_height = 212;
 $list_count = (is_array($list) && $list) ? count($list) : 0;
@@ -14,8 +14,10 @@ $list_count = (is_array($list) && $list) ? count($list) : 0;
     <ul>
     <?php
     for ($i=0; $i<$list_count; $i++) {
-
+        
         $img_link_html = '';
+        
+        $wr_href = get_pretty_url($bo_table, $list[$i]['wr_id']);
 
         if( $i === 0 ) {
             $thumb = get_list_thumbnail($bo_table, $list[$i]['wr_id'], $thumb_width, $thumb_height, false, true);
@@ -27,22 +29,22 @@ $list_count = (is_array($list) && $list) ? count($list) : 0;
                 $thumb['alt'] = '이미지가 없습니다.';
             }
             $img_content = '<img src="'.$img.'" alt="'.$thumb['alt'].'" >';
-            $img_link_html = '<a href="'.$list[$i]['href'].'" class="lt_img" >'.run_replace('thumb_image_tag', $img_content, $thumb).'</a>';
+            $img_link_html = '<a href="'.$wr_href.'" class="lt_img" >'.run_replace('thumb_image_tag', $img_content, $thumb).'</a>';
         }
     ?>
         <li>
             <?php echo $img_link_html; ?>
             <?php
             if ($list[$i]['icon_secret']) echo "<i class=\"fa fa-lock\" aria-hidden=\"true\"></i><span class=\"sound_only\">비밀글</span> ";
-
-            echo "<a href=\"".$list[$i]['href']."\" class=\"pic_li_tit\"> ";
+ 
+            echo "<a href=\"".$wr_href."\" class=\"pic_li_tit\"> ";
             if ($list[$i]['is_notice'])
                 echo "<strong>".$list[$i]['subject']."</strong>";
             else
                 echo $list[$i]['subject'];
 
             echo "</a>";
-
+			
 			if ($list[$i]['icon_new']) echo "<span class=\"new_icon\">N<span class=\"sound_only\">새글</span></span>";
             if ($list[$i]['icon_hot']) echo "<span class=\"hot_icon\">H<span class=\"sound_only\">인기글</span></span>";
 
@@ -60,7 +62,7 @@ $list_count = (is_array($list) && $list) ? count($list) : 0;
 
             <div class="lt_info">
 				<span class="lt_nick"><?php echo $list[$i]['name'] ?></span>
-            	<span class="lt_date"><?php echo $list[$i]['datetime2'] ?></span>
+            	<span class="lt_date"><?php echo $list[$i]['datetime2'] ?></span>              
             </div>
         </li>
     <?php }  ?>
